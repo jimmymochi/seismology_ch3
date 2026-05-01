@@ -17,3 +17,6 @@ seismology_ch3/figures_extracted_hq_3.5/*.json
 seismology_ch3/summaries/
 seismology_ch3/README.md
 seismology_ch3/seismicwave_sort.py
+seismology_ch3/.vscode/
+seismology_ch3/20220322174139_CWASN/
+seismology_ch3/record_section_*.png
