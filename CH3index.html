@@ -334,6 +334,9 @@
     // -------------------------------------------------------------
     // 內容解析與排版輔助函式
     // -------------------------------------------------------------
+    // Max characters before a colon to be considered a "title" prefix within a list item
+    const MAX_TITLE_PREFIX_LEN = 30;
+
     const parseContent = (text) => {
       if (!text) return null;
       const lines = text.split('\n');
@@ -347,7 +350,7 @@
           <ol key={`list-${keyCounter++}`} className="space-y-2.5 my-4 ml-1">
             {listItems.map((item, i) => {
               const colonIdx = item.search(/[：:]/);
-              const hasTitle = colonIdx > 0 && colonIdx < 30;
+              const hasTitle = colonIdx > 0 && colonIdx < MAX_TITLE_PREFIX_LEN;
               return (
                 <li key={i} className="flex gap-3 text-slate-300 leading-relaxed">
                   <span className="mt-0.5 w-5 h-5 bg-cyan-900/70 text-cyan-400 rounded-full flex items-center justify-center text-xs font-bold shrink-0 border border-cyan-800/50">{i + 1}</span>
@@ -967,7 +970,7 @@
       const nextChapter = chapterData[activeIdx + 1];
 
       useEffect(() => {
-        if (mainRef.current) mainRef.current.scrollTop = 0;
+        if (mainRef.current) mainRef.current.scrollTo({ top: 0, behavior: 'smooth' });
       }, [activeTab]);
 
       const navigate = (id) => {
