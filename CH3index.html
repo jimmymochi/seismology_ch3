@@ -16,21 +16,10 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <style>
-    /* 自訂捲軸隱藏與優化樣式 */
-    .scrollbar-hide::-webkit-scrollbar {
-        display: none;
-    }
-    .scrollbar-hide {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-    }
-    html {
-      scroll-behavior: smooth;
-    }
-    body {
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    html { scroll-behavior: smooth; }
+    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100">
@@ -50,8 +39,9 @@
             heading: '一、 地震學的解析力與走時積分',
             content: `相較於重力與磁力觀測的模糊限制，地震波能敏銳且精確地偵測地球內部的物理邊界（如核函邊界 CMB）。<br><br>
 走時研究的核心在於處理「逆向問題」。地震波的總走時 $T$ 實際上是沿著波傳路徑上「慢度（Slowness, $u = 1/v$）」的線積分：
-<div class="bg-slate-800/80 p-4 rounded-xl border border-cyan-900/50 my-4 font-mono text-cyan-300 shadow-inner text-lg text-center">
-  T = &int;<sub>&Gamma;</sub> ( 1 / v(r) ) ds = &int;<sub>&Gamma;</sub> u(r) ds
+<div class="bg-slate-800/80 p-5 rounded-xl border border-cyan-900/50 my-5 shadow-inner">
+  <div class="font-mono text-cyan-300 text-center text-xl mb-3">T = &int;<sub>&Gamma;</sub> ( 1 / v(r) ) ds = &int;<sub>&Gamma;</sub> u(r) ds</div>
+  <p class="text-sm text-slate-400 text-left border-t border-slate-700/60 pt-3 mt-2 leading-relaxed"><strong>公式解析（走時積分）：</strong>此積分式為地震層析成像的核心基石。觀測到的走時 $T$ 是整條路徑 $\Gamma$ 上慢度 $u$ 的累積結果。因為單一射線無法告訴我們各深度的具體速度，科學家必須依賴大量交錯的射線數據來反演未知的速度結構 $v(r)$。</p>
 </div>
 藉由地表大量交錯的走時觀測，我們即可反演出未知的地球內部速度結構 $v(r)$。`,
             images: []
@@ -68,12 +58,14 @@
           {
             heading: '一、 平坦層狀模型的走時公式',
             content: `震源到測站的地震波主要循三條路徑傳遞，其理論走時公式如下：
-<div class="bg-slate-800/80 p-4 rounded-xl border border-cyan-900/50 my-4 font-mono text-cyan-300 shadow-inner space-y-2">
-  <p>1. 直達波 (Direct Wave) : T = x / v₀</p>
-  <p>2. 反射波 (Reflected Wave) : T² = (x / v₀)² + t₀²</p>
-  <p>3. 頭波 (Head Wave) : T = (x / v₁) + &tau;₁</p>
-</div>
-其中，截距時間 <strong>&tau;₁ = (2z cos i<sub>c</sub>) / v₀</strong>，而臨界角 <strong>i<sub>c</sub> = sin⁻¹(v₀/v₁)</strong>。`,
+<div class="bg-slate-800/80 p-5 rounded-xl border border-cyan-900/50 my-5 shadow-inner">
+  <div class="font-mono text-cyan-300 text-center text-xl space-y-3 mb-3">
+    <p>1. 直達波: T = x / v₀</p>
+    <p>2. 反射波: T² = (x / v₀)² + t₀²</p>
+    <p>3. 頭波: T = (x / v₁) + &tau;₁</p>
+  </div>
+  <p class="text-sm text-slate-400 text-left border-t border-slate-700/60 pt-3 mt-2 leading-relaxed"><strong>公式解析（折射走時）：</strong>直達波走時為通過原點的斜直線；頭波的走時同樣是一條直線，截距 &tau;₁ = (2z cos i<sub>c</sub>) / v₀ 包含了地層厚度 $z$ 的資訊。在超過「交會距離」後，頭波會超越直達波成為首波。</p>
+</div>`,
             images: [
               { src: '螢幕擷取畫面 2026-05-02 235506.png', alt: '折射震測走時剖面', desc: '圖 3.2：折射震測經典走時剖面。清晰標示出地表直達波 (Pg)、深部折射頭波 (Pn) 以及莫氏不連續面反射波 (PmP) 的走時斜率與交會距離特徵。' }
             ]
@@ -82,7 +74,8 @@
             heading: '二、 分析限制與盲區',
             content: `折射震測主要面臨兩個逆向問題的盲區：
 1. <strong>低速層 (Low-Velocity Layer)</strong>：波向下偏折無法產生頭波，導致深度推算嚴重誤差。
-2. <strong>隱藏層 (Blind Zone)</strong>：地層太薄或速度差異太小，頭波永遠無法成為首波 (First Arrival)。`
+2. <strong>隱藏層 (Blind Zone)</strong>：地層太薄或速度差異太小，頭波永遠無法成為首波 (First Arrival)。`,
+            images: []
           }
         ],
         conclusion: '透過走時公式與視速度的解析，折射震測學為量測大尺度地殼厚度與速度分佈提供了基礎。',
@@ -95,13 +88,13 @@
         sections: [
           {
             heading: '一、 正常時差 (NMO) 與 Dix 方程式',
-            content: `由於支距 (Offset, $x$) 存在，反射波走時會大於零支距走時 $t_0$，此時間差即為正常時差 (NMO)：
-<div class="bg-slate-800/80 p-4 rounded-xl border border-cyan-900/50 my-4 font-mono text-cyan-300 shadow-inner text-center text-lg">
-  &Delta;T &approx; x² / (2 t₀ v<sub>rms</sub>²)
-</div>
+            content: `由於支距 (Offset, $x$) 存在，反射波走時會大於零支距走時 $t_0$，此時間差即為正常時差 (NMO)。
 對於多層結構，利用 Dix 方程式可從疊加的均方根速度反算出特定地層的區間速度：
-<div class="bg-slate-800/80 p-4 rounded-xl border border-cyan-900/50 my-4 font-mono text-cyan-300 shadow-inner text-center text-lg">
-  v<sub>int</sub>² = (v<sub>rms,n</sub>² t<sub>n</sub> - v<sub>rms,n-1</sub>² t<sub>n-1</sub>) / (t<sub>n</sub> - t<sub>n-1</sub>)
+<div class="bg-slate-800/80 p-5 rounded-xl border border-cyan-900/50 my-5 shadow-inner">
+  <div class="font-mono text-cyan-300 text-center text-xl mb-3">
+    v<sub>int</sub>² = (v<sub>rms,n</sub>² t<sub>n</sub> - v<sub>rms,n-1</sub>² t<sub>n-1</sub>) / (t<sub>n</sub> - t<sub>n-1</sub>)
+  </div>
+  <p class="text-sm text-slate-400 text-left border-t border-slate-700/60 pt-3 mt-2 leading-relaxed"><strong>公式解析（Dix 方程式）：</strong>在多層結構中，我們透過 NMO 校正可求得均方根速度 (v<sub>rms</sub>)。Dix 方程式能利用相鄰兩層反射波的 RMS 速度與走時，精準「剝離」上覆地層的影響，反算出中間特定目標地層的真實區間速度 (v<sub>int</sub>)。</p>
 </div>`,
             images: [
               { src: 'image_a315ff.png', alt: '多層水平地層反射射線幾何圖', desc: '圖 3.3：多層地層的反射幾何路徑，為推導 NMO 與 Dix 方程式的重要數學模型。' }
@@ -109,7 +102,8 @@
           },
           {
             heading: '二、 截距-慢度轉換與偏移成像',
-            content: `將資料轉換至 &tau;-p 空間（$\tau = T - px$），能有效濾除表面波干擾。後續結合<strong>去迴旋 (Deconvolution)</strong> 銳化訊號，並利用<strong>逆向偏移 (Migration)</strong> 消除繞射尾巴，將傾斜地層還原至正確的空間幾何位置。`
+            content: `將資料轉換至 &tau;-p 空間（$\tau = T - px$），能有效濾除表面波干擾。後續結合<strong>去迴旋 (Deconvolution)</strong> 銳化訊號，並利用<strong>逆向偏移 (Migration)</strong> 消除繞射尾巴，將傾斜地層還原至正確的空間幾何位置。`,
+            images: []
           }
         ],
         conclusion: '反射震測學透過精密的陣列訊號處理與波動力學成像，提供了探勘地殼極高解析度的地質剖面。',
@@ -123,10 +117,12 @@
           {
             heading: '一、 球體司乃耳定律與射線參數',
             content: `在球體模型中，射線參數 $p$ 被半徑 $r$ 修正為恆定常數：
-<div class="bg-slate-800/80 p-4 rounded-xl border border-cyan-900/50 my-4 font-mono text-cyan-300 shadow-inner text-center text-lg">
-  p = (r · sin i) / v = 常數
-</div>
-當入射角 $i = 90^\circ$ 時，射線到達反轉點，隨後向地表折返。`,
+<div class="bg-slate-800/80 p-5 rounded-xl border border-cyan-900/50 my-5 shadow-inner">
+  <div class="font-mono text-cyan-300 text-center text-xl mb-3">
+    p = (r &middot; sin i) / v = 常數
+  </div>
+  <p class="text-sm text-slate-400 text-left border-t border-slate-700/60 pt-3 mt-2 leading-relaxed"><strong>公式解析（球體司乃耳定律）：</strong>恆定不變的「射線參數 p」在球體系被修正。沿著一條地震射線，半徑 r、速度 v 與入射角 i 的組合必須保持常數。隨著深度增加 (r 減小) 且波速 v 通常增加，sin i 必須增大，使得射線逐漸彎向水平，直到 i = 90&deg; 到達最深反轉點 (Bottoming point) 後向上折返。</p>
+</div>`,
             images: [
               { src: 'image_a31319.png', alt: '球體司乃耳定律與射線幾何圖', desc: '圖 3.4：球體幾何中的射線折射。射線穿透不同半徑分層時，嚴格遵守恆定射線參數 p 的限制。' }
             ]
@@ -137,7 +133,8 @@
 <div class="bg-slate-800/80 p-4 rounded-xl border border-cyan-900/50 my-4 font-mono text-cyan-300 shadow-inner text-center text-lg">
   ln(R / r₁) = (1 / &pi;) &int;<sub>0</sub><sup>&Delta;₁</sup> cosh⁻¹( p(&Delta;) / p₁ ) d&Delta;
 </div>
-此解析解在速度隨深度單調遞增時極為精準，但遇到低速帶時會產生資訊盲區。`
+此解析解在速度隨深度單調遞增時極為精準，但遇到低速帶時會產生資訊盲區。`,
+            images: []
           }
         ],
         conclusion: '透過嚴謹的球座標數學推導，我們能從地表的走時曲線，如剝洋蔥般層層解譯深部地函的速度剖面。',
@@ -160,7 +157,13 @@
           },
           {
             heading: '二、 表面反射與相角偏移 (Phase Shift)',
-            content: `如 PP 等地表反射波具備「鞍點 (Saddle point)」的數學特徵。每次反射會發生 $\pi/2$ (90°) 的相角偏移。`,
+            content: `如 PP 等地表反射波具備「鞍點 (Saddle point)」的數學特徵。每次反射會發生 $\pi/2$ (90°) 的相角偏移。
+<div class="bg-slate-800/80 p-5 rounded-xl border border-cyan-900/50 my-5 shadow-inner">
+  <div class="font-mono text-cyan-300 text-center text-xl mb-3">
+    u(t) &rarr; &Hilbert;(u(t))  (&Delta;&phi; = &pi; / 2)
+  </div>
+  <p class="text-sm text-slate-400 text-left border-t border-slate-700/60 pt-3 mt-2 leading-relaxed"><strong>公式解析（相角偏移）：</strong>因鞍點特徵，震波每經過一次地表反射，就會發生 90&deg; (&pi;/2) 的希爾伯特轉換相角偏移。因此 S 波與 SS 波波形會明顯改變，而 SSS 波會發生 180&deg; 的完全上下顛倒。</p>
+</div>`,
             images: [
               { src: 'Fig3.5-4_1.png', alt: '全域射線路徑', desc: '圖 3.5.4a：穿越地球整體的波傳幾何網路。' },
               { src: 'Fig3.5-4_2.png', alt: 'PP 波反射', desc: '圖 3.5.4b：PP 波在地表發生反射的射線特性。' },
@@ -182,9 +185,14 @@
             images: [
               { src: 'Fig3.5-12_1.png', alt: 'D″ 層速度異常', desc: '圖 3.5.6a：D″ 層深部的各種異常速度剖面模型。' },
               { src: 'Fig3.5-12_2.png', alt: 'S, Scd 與 ScS 地震波形', desc: '圖 3.5.6b：實際觀測到的 D″ 層折射與反射波形。' },
-              { src: 'Fig3.5-12_4.png', alt: 'D″ 層內的波傳幾何路徑', desc: '圖 3.5.6c：D″ 層邊界的波型轉換與傳遞路徑。' },
+              { src: 'Fig3.5-12_3.png', alt: '合成地震圖波形比較', desc: '圖 3.5.6c：對應觀測資料的合成地震圖 (Synthetic Seismograms) 波形比較。' },
+              { src: 'Fig3.5-12_4.png', alt: 'D″ 層內的波傳幾何路徑', desc: '圖 3.5.6d：D″ 層邊界的波型轉換與傳遞路徑。' },
+              { src: 'Fig3.5-12_6.png', alt: '地函深部速度異常模型', desc: '圖 3.5.6e：不同板塊構造環境下的地函深部速度異常模型。' },
               { src: 'Fig3.5-13_2.png', alt: '核函邊界繞射', desc: '圖 3.5.7：核函邊界邊緣的 SPdKS 繞射與波型轉換。' },
-              { src: 'Fig3.5-14_2.png', alt: '全波場模擬快照 1200s', desc: '圖 3.5.8：超越射線理論的全波場模擬，展示劇烈的波前干涉現象。' }
+              { src: 'Fig3.5-14_1.png', alt: '全波場模擬快照 1500s', desc: '圖 3.5.8a：全波場模擬快照 (1500s)，波前干涉與繞射現象極為明顯。' },
+              { src: 'Fig3.5-14_2.png', alt: '全波場模擬快照 1200s', desc: '圖 3.5.8b：超越射線理論的全波場模擬 (1200s)，展示劇烈的波前干涉現象。' },
+              { src: 'Fig3.5-14_3.png', alt: '全波場模擬快照 1800s', desc: '圖 3.5.8c：全波場模擬快照 (1800s)，呈現尾波與多次繞射波的交織。' },
+              { src: 'Fig3.5-14_4.png', alt: '全波場模擬快照 900s', desc: '圖 3.5.8d：全波場模擬快照 (900s)，震波初次抵達對蹠點區域的波場行為。' }
             ]
           }
         ],
@@ -198,18 +206,21 @@
         sections: [
           {
             heading: '一、 剪力波分裂 (Shear Wave Splitting)',
-            content: `礦物晶體 (如橄欖石) 在受力變形時會產生定向排列 (LPO)。當剪力波穿透此介質時，會分解為快波與慢波。其延遲時間公式：
-<div class="bg-slate-800/80 p-4 rounded-xl border border-cyan-900/50 my-4 font-mono text-cyan-300 shadow-inner text-center text-lg">
-  &delta;t = L &times; ( 1 / v<sub>slow</sub> - 1 / v<sub>fast</sub> )
-</div>
-測量快軸方位與 $\delta t$ 即可推算地函深部的應力與變形方向。`,
+            content: `當礦物晶體 (如橄欖石) 在受力變形時會產生定向排列。當剪力波穿透此介質時，會分解為快波與慢波：
+<div class="bg-slate-800/80 p-5 rounded-xl border border-cyan-900/50 my-5 shadow-inner">
+  <div class="font-mono text-cyan-300 text-center text-xl mb-3">
+    &delta;t = L &times; ( 1 / v<sub>slow</sub> - 1 / v<sub>fast</sub> )
+  </div>
+  <p class="text-sm text-slate-400 text-left border-t border-slate-700/60 pt-3 mt-2 leading-relaxed"><strong>公式解析（延遲時間）：</strong>快波與慢波在傳越厚度為 L 的非均向層後，會產生明顯的時間差 &delta;t。測量快軸方位與 &delta;t，即可直接「看見」地下深部岩石圈的應力與變形方向。</p>
+</div>`,
             images: [
               { src: 'image_a31281.png', alt: '剪力波極化與橫向等向性示意圖', desc: '圖 3.6：剪力波進入層狀非均向介質後，極化分量強制分解為平行 (快) 與垂直 (慢) 的物理機制。' }
             ]
           },
           {
             heading: '二、 固態內核的強烈指向性',
-            content: `觀測顯示，沿著**自轉軸**穿越內核的 PKIKP 波，比沿赤道面快約 3 秒。此驚人的非均向性源於內核由六方最密堆積 (hcp) 鐵晶體順應磁場軸向排列所致。`
+            content: `觀測顯示，沿著**自轉軸**穿越內核的 PKIKP 波，比沿赤道面快約 3 秒。此驚人的非均向性源於內核由六方最密堆積 (hcp) 鐵晶體順應磁場軸向排列所致。`,
+            images: []
           }
         ],
         conclusion: '非均向性就像地球的「動態變形史」紀錄器，讓我們得以看見古老洋脊擴張、造山運動乃至地核生長所遺留的痕跡。',
@@ -222,22 +233,20 @@
         sections: [
           {
             heading: '一、 衰減公式與品質因子 Q',
-            content: `除了幾何擴散與散射外，非彈性阻力會將力學能轉為熱能。空間中的振幅衰減公式：
-<div class="bg-slate-800/80 p-4 rounded-xl border border-cyan-900/50 my-4 font-mono text-cyan-300 shadow-inner text-center text-lg">
-  A(x) = A₀ (1/r) exp( - &omega;x / (2 Q v) )
-</div>
-Q 值越大阻尼越小。衰減對高溫極度敏感，因此層析成像常利用低 Q 值來標定局部的岩漿庫或軟流圈。`,
+            content: `除了幾何擴散與散射外，非彈性阻力會將力學能轉為熱能。衰減對高溫極度敏感，因此常利用低 Q 值來標定局部的岩漿庫。`,
             images: [
               { src: 'image_a30f5c.png', alt: '多重路徑與透鏡效應', desc: '圖 3.7：多重路徑現象。高速異常區造成的透鏡效應會干擾振幅，在估算真實 Q 值前必須先排除此幾何衰減。' }
             ]
           },
           {
             heading: '二、 物理頻散 (Physical Dispersion)',
-            content: `由於高頻波損耗較嚴重，為了不違反訊號傳遞的「因果律」，介質必須存在物理頻散機制：
-<div class="bg-slate-800/80 p-4 rounded-xl border border-cyan-900/50 my-4 font-mono text-cyan-300 shadow-inner text-center text-lg">
-  v(&omega;₁) / v(&omega;₂) &approx; 1 + (1 / &pi;Q) ln(&omega;₁ / &omega;₂)
-</div>
-這調和了高頻體波與低頻自由震盪在波速測量上的矛盾。`
+            content: `由於高頻波損耗較嚴重，為了不違反訊號傳遞的因果律，介質必須存在物理頻散機制：
+<div class="bg-slate-800/80 p-5 rounded-xl border border-cyan-900/50 my-5 shadow-inner">
+  <div class="font-mono text-cyan-300 text-center text-xl mb-3">
+    v(&omega;₁) / v(&omega;₂) &approx; 1 + (1 / &pi;Q) ln(&omega;₁ / &omega;₂)
+  </div>
+  <p class="text-sm text-slate-400 text-left border-t border-slate-700/60 pt-3 mt-2 leading-relaxed"><strong>公式解析（物理頻散）：</strong>由於高頻波損耗較嚴重，為維持「因果律」（不讓波前在數學上早於訊號抵達），介質必須具備頻散特性：低頻波速必須略慢於高頻波。這完美解釋了自由震盪與高頻體波在波速反演上的微小差距。</p>
+</div>`
           }
         ],
         conclusion: 'Q 值與物理頻散的數學推導，將地震學從完美的彈性理論拉回真實的熱力學地球，成為探測地下熱源的最強指標。',
@@ -250,15 +259,14 @@ Q 值越大阻尼越小。衰減對高溫極度敏感，因此層析成像常利
         sections: [
           {
             heading: '一、 密度推演與 A-W 方程式',
-            content: `利用地震波速求得「體積聲速 $\Phi$」：
-<div class="bg-slate-800/80 p-4 rounded-xl border border-cyan-900/50 my-4 font-mono text-cyan-300 shadow-inner text-center text-lg">
-  &Phi; = v<sub>p</sub>² - (4/3)v<sub>s</sub>² = K / &rho;
-</div>
-進而代入 Adams-Williamson 方程式，計算純因重力壓縮造成的密度梯度：
-<div class="bg-slate-800/80 p-4 rounded-xl border border-cyan-900/50 my-4 font-mono text-cyan-300 shadow-inner text-center text-lg">
-  d&rho; / dr = - ( G M(r) &rho;(r) ) / ( r² &Phi;(r) )
-</div>
-當觀測密度大於此理論值時，即暗示了礦物發生了高壓相變（如過渡帶的橄欖石相變）。`
+            content: `利用地震波速求得「體積聲速 $\Phi$」，進而代入 Adams-Williamson 方程式，計算純粹因重力壓縮造成的密度梯度：
+<div class="bg-slate-800/80 p-5 rounded-xl border border-cyan-900/50 my-5 shadow-inner">
+  <div class="font-mono text-cyan-300 text-center text-xl mb-3">
+    d&rho; / dr = - ( G M(r) &rho;(r) ) / ( r² &Phi;(r) )
+  </div>
+  <p class="text-sm text-slate-400 text-left border-t border-slate-700/60 pt-3 mt-2 leading-relaxed"><strong>公式解析（亞當斯-威廉森方程式）：</strong>此方程式計算出純因「重力壓縮」造成的密度變化。當地震觀測到的密度增幅遠大於此公式預測值時（如在上地函過渡帶），即是該區域發生「高壓礦物相變」的鐵證。</p>
+</div>`,
+            images: []
           },
           {
             heading: '二、 地核演化與結晶熱機',
@@ -893,7 +901,6 @@ Q 值越大阻尼越小。衰減對高溫極度敏感，因此層析成像常利
 
           <div className="flex flex-1 overflow-hidden relative">
             
-            {/* 側邊欄：徹底解決關閉時的邊界漏出 */}
             <aside 
               className={`absolute lg:relative z-20 h-full bg-slate-950 shrink-0 transition-all duration-300 ease-in-out overflow-hidden
                 ${isSidebarOpen ? 'w-72 border-r border-slate-800 shadow-2xl lg:shadow-none opacity-100' : 'w-0 border-r-0 opacity-0'}`}
@@ -941,13 +948,11 @@ Q 值越大阻尼越小。衰減對高溫極度敏感，因此層析成像常利
                       <h3 className="text-xl md:text-2xl font-bold text-cyan-300 mb-5 pb-3 border-b border-slate-700/60 tracking-wide">
                         {sec.heading}
                       </h3>
-                      {/* 渲染帶有 HTML 排版的文字與公式 */}
                       <div 
                         className="text-slate-200/90 leading-loose space-y-4 text-[1.05rem] md:text-lg tracking-wide whitespace-pre-wrap"
                         dangerouslySetInnerHTML={{ __html: sec.content }}
                       ></div>
                       
-                      {/* 直接將圖譜渲染於對應文字下方 */}
                       {sec.images && sec.images.length > 0 && (
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-10">
                           {sec.images.map((img, i) => (
