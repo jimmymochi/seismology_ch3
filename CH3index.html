@@ -1,1121 +1,1071 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>地震學與地球結構分析平台</title>
-  
-  <!-- 載入 Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- 載入 React 與 ReactDOM -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  
-  <!-- 載入 Babel 供瀏覽器端編譯 JSX -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>地震學第三章報告</title>
+  
+  <!-- 載入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- 載入 React 與 ReactDOM -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- 載入 Babel 供瀏覽器端編譯 JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <style>
-    /* 自訂捲軸隱藏與優化樣式 */
-    .scrollbar-hide::-webkit-scrollbar {
-        display: none;
-    }
-    .scrollbar-hide {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-    }
-    html {
-      scroll-behavior: smooth;
-    }
-    body {
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-  </style>
-</head>
-<body class="bg-slate-950 text-slate-100">
-  <div id="root"></div>
-
-  <script type="text/babel">
-    const { useState, useEffect, useRef } = React;
-
-    // --- 資料層：完整收錄 3.1 至 3.8 章節內容 ---
-    const chapterData = [
-      {
-        id: '3.1',
-        title: '3.1 導論：地震學與地球結構',
-        summary: '地震學在解析地球內部構造上的核心地位，以及相對於其他地球物理探勘方法的優勢。講義從地球內部速度分佈的推導切入，闡述了地震波如何成為我們窺探地球深處礦物學、化學與熱力學狀態的「透視鏡」，並進一步探討了「正向問題」與「逆向問題」在走時研究中的挑戰。最後引入了折射震測學的基礎概念。',
-        sections: [
-          {
-            heading: '一、 地震學的獨特解析力與地球內部模型',
-            content: `地震學最主要的一項應用，在於測定地球內部的地震波傳遞速度分佈，進而推導出地球內部的彈性特徵（Elastic properties）。這種速度分佈被稱為「地球結構」（Earth Structure），它是我們推斷地球深部礦物組成、化學狀態與熱學特徵最基礎且最重要的限制條件。
-
-與其他地球物理方法相比，地震學的資料具有卓越的解析度（Resolving Power）：
-1. 重力與磁力觀測的侷限性：重力與地磁資料雖然能暗示地球深處存在一個高密度的流體地核，但這類資料對於地核的精確大小與密度分佈，只能提供相對薄弱且模糊的約束條件。
-2. 地震波的敏銳邊界偵測：相較之下，地震波數據能夠精準標定出「核函邊界」（Core-Mantle Boundary, CMB）的深度，並清晰描繪出該邊界上物理特性的劇烈變化。在核函邊界之上（固態地函），P 波與 S 波皆可傳播；然而一旦進入液態外核，S 波便無法傳播，且 P 波的速度會發生急遽下降。這種清晰的觀測結果，構成了我們建立地球內部模型、劃分兩側物理與化學組成的最主要依據。
-
-同樣地，地殼與地函之間的界線（莫氏不連續面），以及關於它們結構和成分的許多推論，也都是來自於地震學的觀測。更廣泛地說，地震學確立了地球「分層結構」的事實，這為行星演化過程中的「物質分化作用」（Differentiation）提供了最直接的證據。`
-          },
-          {
-            heading: '二、 地震波走時（Travel Time）：正向問題與逆向問題',
-            content: `地震學研究地球內部的最基本數據，是地震波的走時（Travel Time）。我們在測站實際量測到的是地震波的「到達時間」，要將其轉換為「走時」，必須先確切知道地震發生的「發震時間」（Origin Time）與「震源位置」。
-
-在走時分析中，我們面臨著兩個不同層次的科學問題：
-1. 正向問題（Forward Problem）：如果地球內部的速度結構是已知的，那麼要計算地震波從震源到測站的傳播路徑、走時與振幅，是一個相對直接且容易的數學問題。
-2. 逆向問題（Inverse Problem）：在實際情況中，我們通常只擁有地表測站觀測到的走時與振幅資料，必須利用這些地表觀測數據去反推地底下的速度結構。這是一項極具挑戰性的工作。因為地震波的走時，實際上是波傳遞路徑上「慢度（Slowness，速度的倒數）」的線積分（Integral Constraint）。單一一條射線的走時，只能提供整體路徑的積分結果，無法告訴我們波在各個深度的具體速度。因此，我們必須仰賴大量來自不同震源、不同測站組合的走時數據，才能拼湊出完整的地底結構。`
-          },
-          {
-            heading: '三、 地球模型的演進與近似',
-            content: `為了處理複雜的地球內部結構，地震學通常採用循序漸進、由簡入繁的模型建立方式：
-1. 平坦層狀模型（Flat Layers）：在震源與測站距離小於幾百公里的地殼或上部地函研究中，我們通常將地球視為均勻、等向性的平坦彈性層狀半空間。
-2. 球體幾何模型（Spherical Geometry）：當觀測距離拉長到全球尺度時，地球的曲率便不可忽略，必須引入球形幾何來修正。
-3. 非均向性與非彈性（Anisotropy and Anelasticity）：真實的地球內部存在側向不均勻性（Heterogeneities）、波速非均向性以及波能衰減等複雜現象，這些都會在更進階的模型中被考慮進來。`
-          },
-          {
-            heading: '四、 折射震測學基礎 (Refraction Seismology)',
-            content: `介紹了「平坦層狀方法」（Flat Layer Method），這是解決逆向問題的最簡單途徑。此方法假設地球是由多個等速的水平地層所組成。在此模型中，震源到測站之間主要有三種射線路徑：
-1. 直達波（Direct Wave）：只在表層內部傳遞，未接觸到底層邊界。其走時曲線是一條通過原點的斜直線，斜率為 1/v0。
-2. 反射波（Reflected Wave）：射線向下傳遞到達介面後，依據入射角等於反射角的定律反彈回地表。
-3. 頭波 / 折射波（Head Wave）：當入射角達到臨界角時，射線會沿著介面滑行，並產生向上折射回地表的波。這是在折射震測學中用來推求底層速度與地層厚度最關鍵的波型。`
-          }
-        ],
-        conclusion: '這份講義雖然是簡短的導論，卻精確點出了地震學的核心價值：透過解譯地震波的走時與波形，解決困難的地球物理逆向問題。從最簡單的平坦分層模型，一路延伸到能夠解析液態外核與地函邊界特性的複雜模型，地震學為我們描繪出了一幅清晰的地球內部畫像。',
-        simulations: ['sim31A', 'sim31B']
-      },
-      {
-        id: '3.2',
-        title: '3.2 折射震測學',
-        summary: '探討「折射震測學」的理論基礎與應用。涵蓋平坦層狀模型中直達波、反射波與頭波（折射波）的走時特徵，介紹莫氏不連續面（Moho）發現過程，延伸至傾斜地層解析、盲區挑戰，並結合岩石礦物學解釋地殼結構。',
-        sections: [
-          {
-            heading: '一、 平坦層狀模型 (Flat Layer Method)',
-            content: `在最簡單的「單一水平層覆蓋於半空間」模型中，震源到測站的地震波主要循三條路徑傳遞：
-1. 直達波 (Direct Wave)：僅在上層（速度 v0）傳播，走時方程式為 T(x) = x/v0。其走時曲線是一條通過原點的斜直線，斜率最大。
-2. 反射波 (Reflected Wave)：波向下抵達界面後反射回地表。其走時曲線呈雙曲線，在遠距離處漸近直達波。
-3. 頭波 / 折射波 (Head Wave)：波以「臨界角」入射界面時，會在界面下方的半空間滑行，並向上激發波回傳。走時為斜率較小但截距大於零的直線：T(x) = x/v1 + τ1。
-
-交會距離 (Crossover Distance)：近距離時直達波先到；超過特定距離後，頭波因在下層高速層傳遞的優勢，超越直達波成為首波 (First Arrival)。`
-          },
-          {
-            heading: '二、 莫氏不連續面 (Moho) 的發現',
-            content: `1909 年，莫霍洛維奇 (A. Mohorovičić) 發現了兩組到達相。較晚的慢速波 (Pg, Sg) 是地殼直達波，較早的快速波 (Pn, Sn) 是在下方高密度地函中傳遞的頭波。這個區分地殼與地函的關鍵邊界被命名為「莫氏不連續面 (Moho)」。`
-          },
-          {
-            heading: '三、 傾斜層狀模型 (Dipping Layer Method)',
-            content: `當介面存在傾角 (θ) 時，需進行反轉剖面 (Reversed Profile) 實驗，取得「順傾」與「逆傾」走時資料。逆傾方向觀測的「視速度」會高於真實速度 v1；順傾方向的視速度則低於 v1。利用差異可推算真實傾角與垂直深度。`
-          },
-          {
-            heading: '四、 資料分析的限制與盲區 (Blind Zones)',
-            content: `1. 低速層問題：若中間層速度較上層慢，波向下偏折不產生頭波，無法從首波察覺，導致深度推算嚴重誤差。
-2. 盲區：地層太薄或速度差異太小，產生的頭波可能永遠無法成為「首波」，易被忽略。`
-          },
-          {
-            heading: '五、 進階分析與地殼特徵',
-            content: `單靠走時難分漸變或尖銳界面，需依賴振幅分析。尖銳界面有強烈超臨界反射波；漸變帶則反射減弱。
-
-全球地殼結構差異：
-1. 海洋地殼：薄且均勻（約 7km），分水層、沉積物層與玄武岩/輝長岩層。
-2. 大陸地殼：厚度變異大（約 30-70km以支撐地殼均衡），結構複雜，存在多反射層或低速帶。
-
-火成岩波速與 SiO2 含量成反比。Moho 在學理上可能是化學成分轉變，或同成分的相變。橄欖岩具非均向性，與地震觀測相符，被認為是上地函主要成分。`
-          },
-          {
-            heading: '六、 經典觀測圖譜解析 (圖庫)',
-            content: `以下為本章節相關的經典折射震測圖譜，展示了地殼與地函邊界的重要幾何特徵：`,
-            images: [
-              { src: '螢幕擷取畫面 2026-05-02 235506.png', alt: '折射震測走時剖面', desc: '折射震測經典走時剖面（以逆時 Time - X/6 繪製）。圖中清晰標示出地表淺層地殼直達波 (Pg)、深部高速層的折射頭波 (Pn) 以及莫氏不連續面的反射波 (PmP) 的走時曲線特徵與交會距離現象。' }
-            ]
-          }
-        ],
-        conclusion: '科學家逐步發展出針對傾斜地層、低速層盲區的分析方法，並結合振幅資訊，將速度剖面轉換為充滿化學意義的地球構造剖面。',
-        simulations: ['sim32A', 'sim32B']
-      },
-      {
-        id: '3.3',
-        title: '3.3 反射震測學',
-        summary: '全面介紹「反射震測學」的核心理論與資料處理流程。從反射波雙曲線走時與正常時差（NMO）出發，探討多頻道觀測、共中點疊加（CMP）、去迴旋（Deconvolution）與逆向偏移（Migration）技術。',
-        sections: [
-          {
-            heading: '一、 反射波走時曲線與正常時差 (NMO)',
-            content: `平坦地層中，反射波走時曲線為雙曲線：T(x)² = x²/v² + t0²。
-- t0 (零支距走時)：震波垂直向下撞擊並折返的雙程時間。
-- 正常時差 (NMO)：由於支距(Offset)存在，走時大於 t0，差值即NMO。
-
-對於多層結構，可利用 Dix 方程式從均方根速度反算出「區間速度」。`
-          },
-          {
-            heading: '二、 截距-慢度空間轉換 (τ-p Formulation)',
-            content: `地震資料可轉換至 τ-p 空間 (p為射線參數，τ為截距)。在此空間中，直達波與頭波收斂成「點」，反射波雙曲線映射為「橢圓」。此數學轉換易於濾除表面波干擾。`
-          },
-          {
-            heading: '三、 多頻道觀測與共中點疊加 (CMP)',
-            content: `1. 共中點 (CMP) 收集：抽取地下反射點相同的震波紀錄。
-2. NMO 校正與疊加：利用疊加速度進行正常時差校正對齊反射訊號。疊加後，反射波因建設性干涉增強，雜訊互相抵消。
-3. 產出零支距剖面，突顯主要反射介面。`
-          },
-          {
-            heading: '四、 訊號增強與去迴旋 (Deconvolution)',
-            content: `地震紀錄是震源波列與反射係數序列的卷積。去迴旋是設計反相濾波器，剝離震源特徵，使訊號「尖銳化」，提升垂直解析度。`
-          },
-          {
-            heading: '五、 逆向偏移 (Migration) 與真實成像',
-            content: `零支距剖面有繞射尾巴且傾斜地層視角錯誤。逆向偏移假設爆炸反射面模型，透過克希荷夫偏移或波動方程式偏移，消除繞射、將地層歸位，還原真實地下構造。`
-          },
-          {
-            heading: '六、 經典觀測圖譜解析 (圖庫)',
-            content: `以下為本章節相關的經典反射震測圖譜，展示了反射波的幾何路徑與理論特徵：`,
-            images: [
-              { src: 'seismology_ch3/figures_extracted_hq_3.5/Fig3.5-1_1.png', alt: '多層水平地層反射射線幾何圖', desc: '多層水平地層的反射射線幾何圖。圖中展示震波由震源 (S) 出發，穿透多個等速地層並於深部介面反射後抵達測站 (R) 的傳遞路徑。此幾何模型為推導反射波雙曲線走時方程式、Dix 方程式與正常時差 (NMO) 的重要基礎。' }
-            ]
-          }
-        ],
-        conclusion: '反射震測學提供精細的地質「X光片」。本節詳述了從野外多頻道觀測、空間轉換到波動力達成像的完整體系，為解析深部構造提供無可替代的工具。',
-        simulations: ['sim33A', 'sim33B']
-      },
-      {
-        id: '3.4',
-        title: '3.4 球體地球中的地震波',
-        summary: '將「平坦分層模型」推廣至「球體地球模型」。推導球座標系下的司乃耳定律，探討速度分佈對走時的影響（三重走時、陰影區），並介紹赫格羅茲-威赫積分進行速度反演。',
-        sections: [
-          {
-            heading: '一、 球體地球中的射線參數與司乃耳定律',
-            content: `在球體模型中，射線參數被修正為 p = (r * sin i)/v。沿著射線，半徑 r、速度 v 與入射角 i 的組合保持常數。
-
-射線反轉點 (Bottoming Point)：隨深度增加波速變快，sin i 增大使射線彎向水平。當 i = 90° 時達最深點，隨後反轉向上。`
-          },
-          {
-            heading: '二、 走時曲線與射線參數的幾何關係',
-            content: `以角距離 Δ 表示距離。走時曲線 T(Δ) 的斜率即射線參數：p = dT/dΔ。可推導出包含速度分佈的積分式，並建立 τ-p 空間的函數。`
-          },
-          {
-            heading: '三、 速度分佈特徵對走時曲線的影響',
-            content: `1. 緩慢增加：走時曲線向下凹，斜率 p 遞減。
-2. 急遽增加（相變帶）：射線強烈向上偏折，造成「三重走時（Triplication）」。尖點處形成振幅極大的焦散現象（Caustics）。
-3. 速度下降（低速帶）：向「下」偏折無法折返，在地表造成「陰影區（Shadow Zone）」。`
-          },
-          {
-            heading: '四、 赫格羅茲-威赫積分 (Herglotz-Wiechert Integral)',
-            content: `逆向問題的解析解。利用走時曲線斜率積分計算反轉深度的半徑與波速。但遇到低速帶時積分失效，需仰賴剝地層法。`
-          },
-          {
-            heading: '五、 經典觀測圖譜解析 (圖庫)',
-            content: `以下為本章節相關的經典球體波傳圖譜，展示了地震射線在球體幾何中的路徑特徵：`,
-            images: [
-              { src: 'seismology_ch3/figures_extracted_hq_3.5/Fig3.5-2_1.png', alt: '球體司乃耳定律與射線幾何圖', desc: '球體司乃耳定律與射線幾何圖。圖中展示射線穿越不同半徑 (r₁, r₂) 與波速 (v₁, v₂) 的同心球體分層時，入射角 (i₁, i₂) 的偏折變化。在此幾何關係中，射線參數 p = (r × sin i)/v 沿著整條射線路徑恆定不變。' }
-            ]
-          }
-        ],
-        conclusion: '從探勘尺度走向全球尺度。嚴謹介紹球座標積分公式，闡明三重走時與陰影區成因，為建立全球標準地球模型奠定基礎。',
-        simulations: ['sim34A', 'sim34B']
-      },
-      {
-        id: '3.5',
-        title: '3.5 體波走時研究',
-        summary: '探討利用全球地震台網的體波走時建構精細分層模型。介紹體波相命名、表面與地核反射波特性、上地函低速帶與過渡帶，以及下地函 D″ 層。',
-        sections: [
-          {
-            heading: '一、 全球地球模型與體波命名規則',
-            content: `P/S 在地函傳遞。小寫 p/s 是先向上反射的波（pP 可推算震源深度）。K/I/J 代表穿透地核的波（K為外核P波，I為內核P波）。c/i 為核函/內外核邊界反射。重複字母為地表多次反射。`
-          },
-          {
-            heading: '二、 表面反射波與相角偏移 (Phase Shift)',
-            content: `PP 或 SS 波在地表反射。因鞍點特性，每次地表反射產生 90度（π/2）相角偏移 (Hilbert Transform)。S 波與 SSS 波波形會上下顛倒。`
-          },
-          {
-            heading: '三、 地核相與陰影區',
-            content: `核函邊界 (CMB) 波速下降，產生 98° 到 145° 的 P 波幾何陰影區。陰影區內可觀測到繞射波 (Pdiff)、穿透內核的 PKIKP 波，以及由散射產生的 PKP 前兆波。`
-          },
-          {
-            heading: '四、 上地函構造',
-            content: `地震岩石圈下方存在低速帶 (LVZ)，對應軟流圈。約 410km 與 660km 深處因礦物高壓相變，波速急升造成三重走時現象。`
-          },
-          {
-            heading: '五、 下地函與 D″ 層',
-            content: `核函邊界上方 200-300km 的 D″ 層是熱邊界層。存在 D″ 不連續面，且其底部極薄區域波速急降，稱為超低速帶 (ULVZ)，可能發生局部熔融。`
-          },
-          {
-            heading: '六、 超越射線理論：真實的波動場',
-            content: `全波場模擬顯示，波在地球內部會被不斷切割、繞射與干涉。真實波場包含豐富物理行為，非單純幾何射線能完全表達。`
-          },
-          {
-            heading: '七、 經典觀測圖譜解析 (圖庫)',
-            content: `以下為本章節相關的經典地震學圖譜，展示了從速度模型、走時曲線到複雜球體射線路徑的真實觀測特徵：`,
-            images: [
-              { src: 'Fig3.5-1_1.png', alt: '圖 3.5-1', desc: '圖 3.5-1：地球內部震波速度與走時對應模型 (JB vs IASP91)。清晰可見過渡帶的波速跳升與 CMB 的波速驟降。' },
-              { src: 'Fig3.5-2_2.png', alt: '圖 3.5-2(a)', desc: '圖 3.5-2(a)：震源至測站的各種射線路徑，包含 pP, PP, ScS 等重要波相，以及沿地表傳播的 Rayleigh 波。' },
-              { src: 'Fig3.5-2_3.png', alt: '圖 3.5-2(b)', desc: '圖 3.5-2(b)：與左圖對應的真實地震圖 (Seismogram)，展示了 P, S 及後續反射相與振幅極大的表面波。' },
-              { src: 'Fig3.5-3_2.png', alt: '圖 3.5-3', desc: '圖 3.5-3：全球地震波相走時曲線圖 (Travel-time curves)。橫軸為距離，縱軸為時間，可見各種波的到達順序。' },
-              { src: 'Fig3.5-4_1.png', alt: '圖 3.5-4(a)', desc: '圖 3.5-4(a)：穿越地球整體的全域射線路徑，展示波如何穿透、反射與繞射。' },
-              { src: 'Fig3.5-4_2.png', alt: '圖 3.5-4(b)', desc: '圖 3.5-4(b)：PP 波在地表發生反射的射線幾何特性。' },
-              { src: 'Fig3.5-4_3.png', alt: '圖 3.5-4(c)', desc: '圖 3.5-4(c)：PP 波在距離上是最大走時，在方位上是最小走時的「鞍點」特性解析。' },
-              { src: 'Fig3.5-6_1.png', alt: '圖 3.5-6(a)', desc: '圖 3.5-6(a)：地核相 PKP 與 PKIKP 的走時曲線分支，展示複雜的焦散與三重走時現象。' },
-              { src: 'Fig3.5-6_2.png', alt: '圖 3.5-6(b)', desc: '圖 3.5-6(b)：穿透內核的 PKIKP 射線路徑密集分佈。' },
-              { src: 'Fig3.5-6_5.png', alt: '圖 3.5-6(c)', desc: '圖 3.5-6(c)：抵達 122 度附近的射線，展示進入陰影區邊緣的波傳行為。' },
-              { src: 'Fig3.5-12_1.png', alt: '圖 3.5-12(a)', desc: '圖 3.5-12(a)：地函深部速度與密度剖面模型比較 (如 PREM 等)，顯示 D″ 層的異常。' },
-              { src: 'Fig3.5-12_2.png', alt: '圖 3.5-12(b)', desc: '圖 3.5-12(b)：不同測站觀測到的 S, Scd 與 ScS 實際地震波形紀錄。' },
-              { src: 'Fig3.5-12_3.png', alt: '圖 3.5-12(c)', desc: '圖 3.5-12(c)：對應觀測資料的合成地震圖 (Synthetic Seismograms) 波形比較。' },
-              { src: 'Fig3.5-12_4.png', alt: '圖 3.5-12(d)', desc: '圖 3.5-12(d)：D″ 層內的波傳幾何路徑，包含直達 S 波、反射 ScS 波與下部折射 Scd 波。' },
-              { src: 'Fig3.5-12_6.png', alt: '圖 3.5-12(e)', desc: '圖 3.5-12(e)：不同板塊構造環境下的地函深部速度異常模型 (如洋脊、年輕大陸等)。' },
-              { src: 'Fig3.5-13_2.png', alt: '圖 3.5-13', desc: '圖 3.5-13：SPdKS 與 SKPdS 射線路徑，展示波在核函邊界 (CMB) 邊緣的繞射與波型轉換。' },
-              { src: 'Fig3.5-14_1.png', alt: '圖 3.5-14(a)', desc: '圖 3.5-14(a)：全波場模擬快照 (Time = 1500 s)，波前干涉與繞射現象極為明顯。' },
-              { src: 'Fig3.5-14_2.png', alt: '圖 3.5-14(b)', desc: '圖 3.5-14(b)：全波場模擬快照 (Time = 1200 s)，展示波在 CMB 與地表的複雜反射。' },
-              { src: 'Fig3.5-14_3.png', alt: '圖 3.5-14(c)', desc: '圖 3.5-14(c)：全波場模擬快照 (Time = 1800 s)，呈現尾波與多次繞射波的交織。' },
-              { src: 'Fig3.5-14_4.png', alt: '圖 3.5-14(d)', desc: '圖 3.5-14(d)：全波場模擬快照 (Time = 900 s)，震波初次抵達對蹠點區域的波場行為。' }
-            ]
-          }
-        ],
-        conclusion: '透過解讀複雜體波相，精準測繪過渡帶起伏、地核分界及 D″ 層謎團。體波走時觀測證實了地球層圈結構。',
-        simulations: ['sim35A', 'sim35B']
-      },
-      {
-        id: '3.6',
-        title: '3.6 地球的非均向性結構',
-        summary: '打破等向性假設，探討非均向性（Anisotropy）對波傳的影響。介紹 SPO 與 LPO，詳細說明橫向等向性、方位非均向性與剪力波分裂現象。',
-        sections: [
-          {
-            heading: '一、 非均向性的基本概念與來源',
-            content: `1. 形狀優選方位 (SPO)：巨觀構造排列（如沉積層、裂隙）。
-2. 晶格優選方位 (LPO)：微觀礦物晶體排列。岩石受變形剪力時，橄欖石等礦物會順應力定向排列。`
-          },
-          {
-            heading: '二、 橫向等向性與剪力波分裂',
-            content: `水平沉積層常造成橫向等向性。SH 波速通常大於 SV 波速。
-
-剪力波分裂 (Shear Wave Splitting)：剪力波進入非均向介質時，會分解為互垂的兩個分量，分別沿「快軸」與「慢軸」傳遞，產生時間差。透過測量可推測變形方向。`
-          },
-          {
-            heading: '三、 方位非均向性與岩石圈動力學',
-            content: `水平波速隨方位角改變。海洋岩石圈擴張時，橄欖石快軸平行擴張方向排列，成為化石證據。大陸岩石圈快軸常平行古造山帶走向或軟流圈流動方向。`
-          },
-          {
-            heading: '四、 D″ 層的非均向性',
-            content: `隱沒帶下方 D″ 層觀測到 SH 波早於 SV 波。可能源自鈣鈦礦/方鎂石定向排列，或板塊物質堆積的水平層狀構造 (SPO)。`
-          },
-          {
-            heading: '五、 固態內核的強烈非均向性',
-            content: `沿自轉軸穿越內核的 PKIKP 波，比沿赤道面快約 3 秒（1%-3%）。可能因內核由六方最密堆積 (hcp) 鐵晶體組成，快軸受磁場或熱對流影響近乎平行自轉軸排列。`
-          },
-          {
-            heading: '六、 經典觀測圖譜解析 (圖庫)',
-            content: `以下為本章節相關的經典非均向性圖譜，展示了地震波在層狀介質中的極化特徵：`,
-            images: [
-              { src: 'seismology_ch3/figures_extracted_hq_3.5/Fig3.5-3_1.png', alt: '剪力波極化與橫向等向性示意圖', desc: '剪力波極化與橫向等向性幾何示意圖。圖中展示了波在層狀介質中的傳播方向與質點運動（極化）的關係。當波平行或垂直層狀構造傳播時，剪力波會明確分解為互相垂直的極化分量（如 SH 與 SV 波），此為解釋剪力波分裂（Shear Wave Splitting）機制的基礎物理模型。' }
-            ]
-          }
-        ],
-        conclusion: '非均向性結構揭示了地球內部的「動態變形史」。「剪力波分裂」與「方位波速變化」成為直接看見深部流動與變形痕跡的犀利工具。',
-        simulations: ['sim36A', 'sim36B']
-      },
-      {
-        id: '3.7',
-        title: '3.7 地震波的衰減與非彈性',
-        summary: '探討地震波傳播時振幅衰減的物理機制。歸納為幾何擴散、多重路徑、散射與非彈性。引入品質因子 Q 量化衰減，並討論物理頻散現象。',
-        sections: [
-          {
-            heading: '一、 彈性衰減機制',
-            content: `1. 幾何擴散：波前面積增大，單位面積能量減少。體波依 1/r 衰減，表面波依 1/√(sinΔ) 衰減。
-2. 多重路徑：波速不均勻導致折射與聚焦/發散，形成焦散面。
-3. 散射：遇波長相近的非均勻體（碎裂帶）將能量四散，形成尾波。月球因岩石破碎且無水，散射強而本質衰減弱，月震迴盪長。`
-          },
-          {
-            heading: '二、 非彈性與品質因子 (Q)',
-            content: `非彈性衰減是克服微觀阻力，將力學能轉為熱能。用帶阻尼器的諧振子模擬，振幅以指數形式衰減。
-
-品質因子 Q 越大量表阻尼越小、衰減越慢。堅硬地函 Q 約 200-500。P波體積壓縮不耗能，故 Qα 約為 Qβ 的 4/9。`
-          },
-          {
-            heading: '三、 物理頻散與因果律',
-            content: `高頻波經歷振動次數多，能量損耗較低頻波嚴重。為維持「因果律」（不讓訊號早於波抵達），介質必須具備「物理頻散」：低頻波速略慢於高頻波。調和了自由震盪與體波反演的波速差異。`
-          },
-          {
-            heading: '四、 衰減與溫度關係',
-            content: `非彈性衰減對溫度呈指數反應。遇高溫或部分熔融，Q 值急降。結合波速與衰減的聯合層析成像，是探測熱構造的絕佳利器。`
-          },
-          {
-            heading: '五、 經典觀測圖譜解析 (圖庫)',
-            content: `以下為本章節相關的經典圖譜，展示了波傳過程中的多重路徑等幾何衰減特徵：`,
-            images: [
-              { src: 'seismology_ch3/figures_extracted_hq_3.5/Fig3.5-4_1.png', alt: '多重路徑與高速異常區示意圖', desc: '多重路徑 (Multipathing) 幾何示意圖。當震波遭遇局部高速異常區 (High-velocity region) 時，實際射線路徑 (Actual path) 會發生折射並偏離理論預測路徑 (Predicted path)。這種透鏡效應會造成能量聚焦或發散，在估算真實非彈性衰減 (Intrinsic Attenuation) 前，必須先排除此類彈性幾何效應的干擾。' }
-            ]
-          }
-        ],
-        conclusion: '區分了能量守恆的散射與真實耗能的非彈性。引入 Q 值不僅量化衰減，更調和了物理頻散的因果律必然性，為探測地下熱構造提供指標。',
-        simulations: ['sim37A', 'sim37B']
-      },
-      {
-        id: '3.8',
-        title: '3.8 地函與地核的組成成分',
-        summary: '地震學應用於探索深部物質組成的集大成。結合物理限制與亞當斯-威廉森方程式推導密度，探討地溫梯度、礦物相變對地函的影響，及地核演化。',
-        sections: [
-          {
-            heading: '一、 密度的基本限制與亞當斯-威廉森方程式',
-            content: `地球平均密度 5.5 g/cm³ 遠大於地表，轉動慣量 0.33 小於均勻球體，證明必有緻密金屬核心。
-
-亞當斯-威廉森方程式利用「體積聲速」推算受重力壓縮增加的密度。過渡帶密度增幅大於重力壓縮，暗示發生了「礦物相變」。`
-          },
-          {
-            heading: '二、 地球內部的溫度分佈 (Geotherm)',
-            content: `1. 邊界層高梯度：熱傳導區域（岩石圈、D″層），溫度急遽增加。D″層高溫可能導致岩石逼近熔點形成超低速帶(ULVZ)。
-2. 對流區低梯度：地函與外核以對流傳熱，溫度接近絕熱梯度，增加平緩，深部岩石在高壓下變得堅硬。`
-          },
-          {
-            heading: '三、 地函的化學組成與礦物相變',
-            content: `觀測特徵與富含鎂鐵矽酸鹽的橄欖岩 (Pyrolite) 模型極為吻合。橄欖石隨深度經歷固態相變：
-1. 410公里不連續面：橄欖石(α相)轉為瓦茲利石(β相)。放熱反應。
-2. 520公里不連續面：轉為林伍德石(γ相)，過渡帶寬。
-3. 660公里不連續面：分解為鈣鈦礦 (Perovskite) 與方鎂石。鈣鈦礦佔下地函70%。此為吸熱反應。`
-          },
-          {
-            heading: '四、 複雜的 D″ 層',
-            content: `核函邊界化學邊界層假說：
-- 隱沒板塊榴輝岩殘骸與地函反應沉積。
-- 溫度驟升使鈣鈦礦相變為高波速斯石英與低速富鐵方鎂石，後者局部熔融形成 ULVZ。`
-          },
-          {
-            heading: '五、 地核的組成與演化',
-            content: `主要由鐵鎳合金構成，含 10-15% 輕元素。壓力使內核呈固態，且內外核成分不同。純鐵結晶釋放潛熱與重力位能（部分結晶），驅動外核熱對流產生地球磁場 (Geodynamo)。`
-          },
-          {
-            heading: '六、 經典觀測圖譜解析 (圖庫)',
-            content: `以下為本章節相關的經典熱力學與成分相圖，展示了地核在冷卻過程中的結晶演化特徵：`,
-            images: [
-              { src: 'seismology_ch3/figures_extracted_hq_3.5/Fig3.5-5_1.png', alt: 'Fe-FeS 二元相圖與地核結晶', desc: 'Fe-FeS (鐵-硫化鐵) 二元相圖。圖中展示了地核物質在冷卻過程中的部分結晶 (Fractional Crystallization) 行為。隨著整體溫度下降，純鐵 (Fe) 固相會率先結晶沉降以形成內核，同時將輕元素（如硫 S）排擠並保留在液態外核中。此熱化學過程不僅釋放結晶潛熱，下沉的鐵更釋放了重力位能，兩者構成了驅動地球磁場 (Geodynamo) 對流的最主要動力來源。' }
-            ]
-          }
-        ],
-        conclusion: '地球內部非一成不變，而是一部熱化學交織的巨大熱機。從礦物相變到地核動態結晶，讓我們得以一窺行星演化的宏觀奧秘。',
-        simulations: ['sim38A', 'sim38B']
-      }
-    ];
-
-    // -------------------------------------------------------------
-    // 獨立 SVG 動態模擬元件區
-    // -------------------------------------------------------------
-
-    const Sim31A = () => {
-      const [depth, setDepth] = useState(1000);
-      const getLayerInfo = (d) => {
-        if (d < 35) return { name: "地殼 (Crust)", rho: "2.7-3.0", vp: "6.0" };
-        if (d < 2890) return { name: "地函 (Mantle)", rho: "3.3-5.5", vp: "8.0-13.7" };
-        if (d < 5150) return { name: "外核 (Outer Core)", rho: "9.9-12.2", vp: "8.0-10.4 (液態 S=0)" };
-        return { name: "內核 (Inner Core)", rho: "12.8-13.1", vp: "11.0" };
-      };
-      const info = getLayerInfo(depth);
-      return (
-        <div className="bg-slate-900 p-5 md:p-6 rounded-xl border border-slate-700/50 my-6 shadow-lg transition-all duration-300 hover:shadow-cyan-900/10">
-          <h3 className="text-xl font-bold text-amber-400 mb-3 tracking-wide">模擬 3.1-A：地球分層結構與波速</h3>
-          <p className="text-[1.05rem] leading-relaxed text-slate-300 mb-5">滑動深度觀察內部狀態與波速特徵。深度：<span className="font-mono text-cyan-300">{depth} km</span></p>
-          <input type="range" min="0" max="6371" value={depth} onChange={(e) => setDepth(Number(e.target.value))} className="w-full mb-6 accent-cyan-500 cursor-pointer" />
-          <div className="flex flex-col md:flex-row items-center gap-6">
-            <svg viewBox="0 0 100 100" className="w-32 h-32 md:w-40 md:h-40 shrink-0">
-              <circle cx="50" cy="50" r="48" fill="#1e293b" stroke="#334155" />
-              <circle cx="50" cy="50" r="26" fill="#b45309" opacity="0.8" />
-              <circle cx="50" cy="50" r="10" fill="#fcd34d" />
-              <circle cx="50" cy="50" r={48 * (1 - depth/6371)} fill="transparent" stroke="#06b6d4" strokeWidth="2" strokeDasharray="4" />
-            </svg>
-            <div className="text-[1.05rem] text-cyan-100 bg-slate-800/80 p-5 rounded-lg w-full leading-loose border border-slate-700/50">
-              <p><strong className="text-slate-400 font-medium">層圈：</strong> {info.name}</p>
-              <p><strong className="text-slate-400 font-medium">密度 (g/cm³)：</strong> {info.rho}</p>
-              <p><strong className="text-slate-400 font-medium">P波波速 (km/s)：</strong> {info.vp}</p>
-            </div>
-          </div>
-        </div>
-      );
+  <!-- 載入 MathJax 供公式渲染 -->
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] }
     };
-
-    const Sim31B = () => {
-      const [rays, setRays] = useState(2);
-      return (
-        <div className="bg-slate-900 p-5 md:p-6 rounded-xl border border-slate-700/50 my-6 shadow-lg transition-all duration-300 hover:shadow-cyan-900/10">
-          <h3 className="text-xl font-bold text-amber-400 mb-3 tracking-wide">模擬 3.1-B：逆向問題與解析度</h3>
-          <p className="text-[1.05rem] leading-relaxed text-slate-300 mb-5">增加測站與射線數量（交錯資料），以解析未知的地底構造（紅色異常區）。</p>
-          <input type="range" min="1" max="10" value={rays} onChange={(e) => setRays(Number(e.target.value))} className="w-full mb-6 accent-cyan-500 cursor-pointer" />
-          <div className="relative w-full h-40 bg-slate-800 rounded-lg border border-slate-600 overflow-hidden shadow-inner">
-            <div className="absolute top-1/2 left-1/2 w-16 h-16 bg-red-500/30 -translate-x-1/2 -translate-y-1/2 blur-sm rounded-full"></div>
-            {Array.from({length: rays}).map((_, i) => (
-              <div key={`h-${i}`} className="absolute h-0.5 bg-cyan-400/40 w-full transition-all duration-300" style={{top: `${(i+1)*(100/(rays+1))}%`}}></div>
-            ))}
-            {Array.from({length: rays}).map((_, i) => (
-              <div key={`v-${i}`} className="absolute w-0.5 bg-cyan-400/40 h-full transition-all duration-300" style={{left: `${(i+1)*(100/(rays+1))}%`}}></div>
-            ))}
-            {rays > 5 && <div className="absolute top-1/2 left-1/2 w-16 h-16 bg-red-500/90 border-2 border-red-400 -translate-x-1/2 -translate-y-1/2 opacity-100 transition-opacity duration-500 rounded flex items-center justify-center text-xs font-bold text-white shadow-lg">解析成功</div>}
-          </div>
-        </div>
-      );
-    };
-
-    const Sim32A = () => {
-      const [distance, setDistance] = useState(150);
-      const depth = 40, maxDistance = 300, xc = depth * Math.tan(Math.asin(3/5));
-      const hasHeadWave = distance >= 2 * xc;
-      return (
-        <div className="bg-slate-900 p-5 md:p-6 rounded-xl border border-slate-700/50 my-6 shadow-lg transition-all duration-300 hover:shadow-cyan-900/10">
-          <h3 className="text-xl font-bold text-amber-400 mb-3 tracking-wide">模擬 3.2-A：平坦層狀折射波傳</h3>
-          <p className="text-[1.05rem] leading-relaxed text-slate-300 mb-5">觀察直達波(黃)、反射波(藍)與折射頭波(紅)幾何路徑。當前距離: <span className="font-mono text-cyan-300">{distance} km</span></p>
-          <input type="range" min="10" max={maxDistance} value={distance} onChange={(e) => setDistance(Number(e.target.value))} className="w-full mb-6 accent-cyan-500 cursor-pointer" />
-          <svg viewBox={`0 0 ${maxDistance} 100`} className="w-full h-32 md:h-40 bg-slate-800 rounded-lg shadow-inner border border-slate-700/50">
-            <rect x="0" y="0" width={maxDistance} height={depth} fill="#1e293b" />
-            <rect x="0" y={depth} width={maxDistance} height={100-depth} fill="#0f172a" />
-            <line x1="0" y1={depth} x2={maxDistance} y2={depth} stroke="#475569" strokeDasharray="4" />
-            <circle cx="5" cy="5" r="3" fill="#f87171" /><circle cx={distance} cy="5" r="3" fill="#38bdf8" />
-            <line x1="5" y1="5" x2={distance} y2="5" stroke="#fbbf24" strokeWidth="2" />
-            <polyline points={`5,5 ${distance/2},${depth} ${distance},5`} fill="none" stroke="#60a5fa" strokeWidth="2" />
-            {hasHeadWave && <polyline points={`5,5 ${xc},${depth} ${distance-xc},${depth} ${distance},5`} fill="none" stroke="#f43f5e" strokeWidth="2" strokeDasharray="3" />}
-          </svg>
-        </div>
-      );
-    };
-
-    const Sim32B = () => {
-      const [dip, setDip] = useState(10);
-      return (
-        <div className="bg-slate-900 p-5 md:p-6 rounded-xl border border-slate-700/50 my-6 shadow-lg transition-all duration-300 hover:shadow-cyan-900/10">
-          <h3 className="text-xl font-bold text-amber-400 mb-3 tracking-wide">模擬 3.2-B：傾斜地層 (Dipping Layer)</h3>
-          <p className="text-[1.05rem] leading-relaxed text-slate-300 mb-5">傾角 θ 影響視速度。順傾(Down-dip)視速度變慢，逆傾(Up-dip)視速度變快。傾角: <span className="font-mono text-cyan-300">{dip}°</span></p>
-          <input type="range" min="0" max="25" value={dip} onChange={(e) => setDip(Number(e.target.value))} className="w-full mb-6 accent-cyan-500 cursor-pointer" />
-          <svg viewBox="0 0 300 100" className="w-full h-32 md:h-40 bg-slate-800 rounded-lg shadow-inner border border-slate-700/50">
-            <polygon points={`0,0 300,0 300,${50 + dip*2} 0,50`} fill="#1e293b" className="transition-all duration-300" />
-            <polygon points={`0,50 300,${50 + dip*2} 300,100 0,100`} fill="#0f172a" className="transition-all duration-300" />
-            <line x1="0" y1="50" x2="300" y2={50 + dip*2} stroke="#f43f5e" strokeWidth="2.5" strokeDasharray="4" className="transition-all duration-300" />
-            <text x="10" y="20" fill="#fbbf24" fontSize="12" fontWeight="bold">順傾 (Down-dip) →</text>
-            <text x="190" y="20" fill="#60a5fa" fontSize="12" fontWeight="bold">← 逆傾 (Up-dip)</text>
-          </svg>
-        </div>
-      );
-    };
-
-    const Sim33A = () => {
-      const [vel, setVel] = useState(2000);
-      const t0 = 20;
-      const generateCurve = () => Array.from({length: 40}).map((_, i) => {
-        const x = i * 10;
-        const t = Math.sqrt(t0*t0 + (x*x)/(vel/100)*(vel/100));
-        return `${x},${t+10}`;
-      }).join(' ');
-      return (
-        <div className="bg-slate-900 p-5 md:p-6 rounded-xl border border-slate-700/50 my-6 shadow-lg transition-all duration-300 hover:shadow-cyan-900/10">
-          <h3 className="text-xl font-bold text-amber-400 mb-3 tracking-wide">模擬 3.3-A：反射波正常時差 (NMO)</h3>
-          <p className="text-[1.05rem] leading-relaxed text-slate-300 mb-5">波速越快，走時雙曲線越平坦。地層波速: <span className="font-mono text-cyan-300">{vel} m/s</span></p>
-          <input type="range" min="1500" max="4000" value={vel} onChange={(e) => setVel(Number(e.target.value))} className="w-full mb-6 accent-cyan-500 cursor-pointer" />
-          <svg viewBox="0 0 400 100" className="w-full h-32 md:h-40 bg-slate-800 rounded-lg shadow-inner border border-slate-700/50">
-            <line x1="0" y1="10" x2="400" y2="10" stroke="#475569" strokeWidth="2" />
-            <text x="5" y="8" fill="#94a3b8" fontSize="10">Offset (x)</text>
-            <polyline points={generateCurve()} fill="none" stroke="#06b6d4" strokeWidth="3" className="transition-all duration-300" />
-          </svg>
-        </div>
-      );
-    };
-
-    const Sim33B = () => {
-      const [strength, setStrength] = useState(0);
-      return (
-        <div className="bg-slate-900 p-5 md:p-6 rounded-xl border border-slate-700/50 my-6 shadow-lg transition-all duration-300 hover:shadow-cyan-900/10">
-          <h3 className="text-xl font-bold text-amber-400 mb-3 tracking-wide">模擬 3.3-B：去迴旋 (Deconvolution)</h3>
-          <p className="text-[1.05rem] leading-relaxed text-slate-300 mb-5">剝離震源波列特徵，使反射訊號「尖銳化」，提升垂直解析度。</p>
-          <input type="range" min="0" max="100" value={strength} onChange={(e) => setStrength(Number(e.target.value))} className="w-full mb-6 accent-cyan-500 cursor-pointer" />
-          <svg viewBox="0 0 400 60" className="w-full h-24 md:h-32 bg-slate-800 rounded-lg shadow-inner border border-slate-700/50">
-            <path d={`M 0 30 Q 20 ${30 - 20*(1-strength/100)} 40 30 T 80 30 T 120 30`} fill="none" stroke="#94a3b8" strokeWidth="2.5" className="transition-all duration-300" />
-            {strength > 50 && <line x1="60" y1="10" x2="60" y2="50" stroke="#f43f5e" strokeWidth="2.5" className="opacity-80" />}
-            <text x="200" y="35" fill="#f87171" fontSize="14" fontWeight="bold">
-              {strength < 20 ? '原始寬波列' : strength > 80 ? '尖銳反射脈衝' : '濾波處理中...'}
-            </text>
-          </svg>
-        </div>
-      );
-    };
-
-    const Sim34A = () => {
-      const [angle, setAngle] = useState(25);
-      const R = 150, rCore = 80, cx = 200, cy = 200;
-      const rad = (angle * Math.PI) / 180;
-      const penetrationDepth = R * Math.sin(rad); 
-      const isShadowZone = penetrationDepth < rCore + 10 && penetrationDepth > rCore - 20;
-      const hitsCore = penetrationDepth <= rCore;
-      return (
-        <div className="bg-slate-900 p-5 md:p-6 rounded-xl border border-slate-700/50 my-6 shadow-lg transition-all duration-300 hover:shadow-cyan-900/10">
-          <h3 className="text-xl font-bold text-amber-400 mb-3 tracking-wide">模擬 3.4-A：球體波傳與陰影區</h3>
-          <p className="text-[1.05rem] leading-relaxed text-slate-300 mb-5">調整射出角度。當波抵達低速外核時急遽偏折，產生 P波陰影區。</p>
-          <input type="range" min="15" max="60" value={angle} onChange={(e) => setAngle(Number(e.target.value))} className="w-full mb-6 accent-cyan-500 cursor-pointer" />
-          <div className="flex justify-center relative">
-            <svg width="300" height="200" viewBox="0 0 400 300" className="bg-slate-800 rounded-lg shadow-inner border border-slate-700/50">
-              <circle cx={cx} cy={cy} r={R} fill="#0f172a" stroke="#475569" strokeWidth="2" />
-              <circle cx={cx} cy={cy} r={rCore} fill="#b45309" opacity="0.4" stroke="#d97706" />
-              <circle cx={cx} cy={cy-R} r="5" fill="#f87171" />
-              {hitsCore ? 
-                <path d={`M ${cx} ${cy-R} Q ${cx-50} ${cy-rCore/2} ${cx-60} ${cy-rCore}`} fill="none" stroke="#ef4444" strokeWidth="3" className="transition-all duration-300" /> :
-                <path d={`M ${cx} ${cy-R} Q ${cx} ${cy-penetrationDepth} ${cx + R*Math.sin(rad*4)} ${cy - R*Math.cos(rad*4)}`} fill="none" stroke="#34d399" strokeWidth="3" className="transition-all duration-300" />
-              }
-            </svg>
-          </div>
-        </div>
-      );
-    };
-
-    const Sim34B = () => {
-      const [pos, setPos] = useState(50);
-      return (
-        <div className="bg-slate-900 p-5 md:p-6 rounded-xl border border-slate-700/50 my-6 shadow-lg transition-all duration-300 hover:shadow-cyan-900/10">
-          <h3 className="text-xl font-bold text-amber-400 mb-3 tracking-wide">模擬 3.4-B：三重走時現象 (Triplication)</h3>
-          <p className="text-[1.05rem] leading-relaxed text-slate-300 mb-5">波速急遽增加導致走時曲線產生折疊。單一距離可觀測到三個不同路徑的相位。</p>
-          <input type="range" min="0" max="100" value={pos} onChange={(e) => setPos(Number(e.target.value))} className="w-full mb-6 accent-cyan-500 cursor-pointer" />
-          <svg viewBox="0 0 400 150" className="w-full h-32 md:h-40 bg-slate-800 rounded-lg shadow-inner border border-slate-700/50">
-            <path d="M 50 120 C 150 90, 200 80, 250 60 L 150 50 C 200 30, 300 20, 380 10" fill="none" stroke="#06b6d4" strokeWidth="2.5" />
-            <line x1={50 + pos*3} y1="0" x2={50 + pos*3} y2="150" stroke="#f43f5e" strokeWidth="2" strokeDasharray="4" className="transition-all duration-300" />
-            <text x="10" y="20" fill="#94a3b8" fontSize="12" fontWeight="bold">時間 T</text>
-            <text x="350" y="140" fill="#94a3b8" fontSize="12" fontWeight="bold">距離 Δ</text>
-          </svg>
-        </div>
-      );
-    };
-
-    // -------------------------------------------------------------
-    // 3.5-A 體波命名與動態射線 (能量傳遞版)
-    // -------------------------------------------------------------
-    const Sim35A = () => {
-      const [phase, setPhase] = useState('P');
-      const [animKey, setAnimKey] = useState(0); 
-      
-      const R = 120, rc = 65, ric = 25, cx = 200, cy = 150;
-      const sourceY = cy - R + 5;
-      
-      const paths = {
-        P: `M ${cx} ${sourceY} Q ${cx+70} ${cy-10} ${cx+R*0.96} ${cy+R*0.25}`,
-        S: `M ${cx} ${sourceY} Q ${cx-70} ${cy-10} ${cx-R*0.96} ${cy+R*0.25}`,
-        pP: `M ${cx} ${sourceY} L ${cx-15} ${cy-R+1} Q ${cx-80} ${cy-10} ${cx-R*0.8} ${cy+R*0.6}`,
-        sS: `M ${cx} ${sourceY} L ${cx+15} ${cy-R+1} Q ${cx+80} ${cy-10} ${cx+R*0.8} ${cy+R*0.6}`,
-        PP: `M ${cx} ${sourceY} Q ${cx+40} ${cy-40} ${cx+R*0.7} ${cy-R*0.7} Q ${cx+110} ${cy+20} ${cx+R*0.5} ${cy+R*0.86}`,
-        SS: `M ${cx} ${sourceY} Q ${cx-40} ${cy-40} ${cx-R*0.7} ${cy-R*0.7} Q ${cx-110} ${cy+20} ${cx-R*0.5} ${cy+R*0.86}`,
-        PcP: `M ${cx} ${sourceY} Q ${cx+20} ${cy-30} ${cx+30} ${cy-rc} Q ${cx+50} ${cy-30} ${cx+R*0.6} ${cy-R*0.8}`,
-        ScS: `M ${cx} ${sourceY} Q ${cx-20} ${cy-30} ${cx-30} ${cy-rc} Q ${cx-50} ${cy-30} ${cx-R*0.6} ${cy-R*0.8}`,
-        Pdiff: `M ${cx} ${sourceY} Q ${cx+30} ${cy-60} ${cx+41} ${cy-50} A ${rc} ${rc} 0 0 0 ${cx-41} ${cy-50} Q ${cx-30} ${cy-60} ${cx-R*0.8} ${cy+R*0.6}`,
-        PKP: `M ${cx} ${sourceY} L ${cx+25} ${cy-rc} L ${cx+35} ${cy+rc} L ${cx+60} ${cy+R*0.86}`,
-        PKiKP: `M ${cx} ${sourceY} L ${cx+15} ${cy-20} L ${cx+R*0.6} ${cy+R*0.8}`,
-        PKIKP: `M ${cx} ${sourceY} L ${cx+10} ${cy-rc} L ${cx+5} ${cy-ric} L ${cx} ${cy+ric} L ${cx-10} ${cy+rc} L ${cx-20} ${cy+R}`,
-        SKS: `M ${cx} ${sourceY} L ${cx-25} ${cy-rc} L ${cx-35} ${cy+rc} L ${cx-60} ${cy+R*0.86}`
-      };
-      
-      const colors = { 
-        P: '#34d399', S: '#f472b6', pP: '#38bdf8', sS: '#818cf8', PP: '#a78bfa', SS: '#e879f9',
-        PcP: '#fbbf24', ScS: '#fb923c', Pdiff: '#facc15', PKP: '#ef4444', PKiKP: '#2dd4bf', PKIKP: '#fcd34d', SKS: '#ec4899' 
-      };
-
-      const handlePhaseChange = (p) => {
-        setPhase(p);
-        setAnimKey(prev => prev + 1);
-      };
-
-      const getEndPoint = (pathStr) => {
-        const numbers = pathStr.match(/[-\d.]+/g);
-        if (numbers && numbers.length >= 2) {
-          return {
-            x: parseFloat(numbers[numbers.length - 2]),
-            y: parseFloat(numbers[numbers.length - 1])
-          };
-        }
-        return { x: cx, y: cy };
-      };
-      const endPoint = getEndPoint(paths[phase]);
-
-      return (
-        <div className="bg-slate-900 p-5 md:p-6 rounded-xl border border-slate-700/50 my-6 shadow-xl transition-all duration-300 hover:shadow-cyan-900/10">
-          <h3 className="text-xl font-bold text-amber-400 mb-3 flex items-center tracking-wide">
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-            模擬 3.5-A：體波命名與動態射線 (能量傳遞版)
-          </h3>
-          <p className="text-[1.05rem] leading-relaxed text-slate-300 mb-5">請點擊下方波相按鈕：觀察能量自「震源」釋放後，以波陣面形式推進，並在抵達「終點」時激發出強烈的能量衝擊波。</p>
-          <div className="flex flex-wrap gap-3 mb-6 justify-center">
-            {Object.keys(paths).map(p => (
-              <button 
-                key={p} 
-                onClick={() => handlePhaseChange(p)} 
-                className={`px-4 py-2 rounded-full text-sm font-bold transition-all duration-300 ease-out
-                  ${phase===p ? 'bg-cyan-500 text-slate-900 shadow-[0_0_15px_rgba(6,182,212,0.8)] scale-110' : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-600'}`}
-              >
-                {p}
-              </button>
-            ))}
-          </div>
-          <div className="flex justify-center relative">
-            <svg key={`simulation-${animKey}`} width="100%" height="320" viewBox="0 0 400 300" className="bg-slate-950 rounded-lg shadow-inner overflow-hidden border border-slate-800">
-              <defs>
-                <radialGradient id="mantle-grad" cx="50%" cy="50%" r="50%">
-                  <stop offset="70%" stopColor="#1e293b"/>
-                  <stop offset="100%" stopColor="#0f172a"/>
-                </radialGradient>
-                <radialGradient id="outer-core-grad" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#9a3412" stopOpacity="0.4"/>
-                  <stop offset="100%" stopColor="#ea580c" stopOpacity="0.6"/>
-                </radialGradient>
-                <radialGradient id="inner-core-grad" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#fef08a"/>
-                  <stop offset="100%" stopColor="#eab308"/>
-                </radialGradient>
-                <filter id="wave-glow">
-                  <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
-                  <feMerge>
-                    <feMergeNode in="coloredBlur"/>
-                    <feMergeNode in="SourceGraphic"/>
-                  </feMerge>
-                </filter>
-              </defs>
-
-              <circle cx={cx} cy={cy} r={R} fill="url(#mantle-grad)" stroke="#475569" strokeWidth="2" />
-              <circle cx={cx} cy={cy} r={rc} fill="url(#outer-core-grad)" stroke="#c2410c" strokeWidth="1.5" strokeDasharray="4" />
-              <circle cx={cx} cy={cy} r={ric} fill="url(#inner-core-grad)" />
-              
-              <text x={cx+R+10} y={cy} fill="#64748b" fontSize="12" fontWeight="bold">地函</text>
-              <text x={cx+rc+5} y={cy} fill="#fdba74" fontSize="12" fontWeight="bold">外核</text>
-              <text x={cx-12} y={cy+4} fill="#854d0e" fontSize="10" fontWeight="bold">內核</text>
-
-              <path d={paths[phase]} fill="none" stroke={colors[phase]} strokeWidth="1" strokeDasharray="4" opacity="0.2" />
-
-              <circle cx={cx} cy={sourceY} r="5" fill="#ef4444" />
-              <text x={cx-14} y={sourceY-12} fill="#fca5a5" fontSize="12" fontWeight="bold">震源</text>
-              <g>
-                <circle cx={cx} cy={sourceY} r="0" fill="none" stroke="#ef4444" strokeWidth="2.5">
-                   <animate attributeName="r" values="0;50" dur="1s" begin="0s" repeatCount="1" fill="freeze" />
-                   <animate attributeName="opacity" values="1;0" dur="1s" begin="0s" repeatCount="1" fill="freeze" />
-                </circle>
-                <circle cx={cx} cy={sourceY} r="0" fill="none" stroke="#ef4444" strokeWidth="1.5">
-                   <animate attributeName="r" values="0;40" dur="1s" begin="0.2s" repeatCount="1" fill="freeze" />
-                   <animate attributeName="opacity" values="1;0" dur="1s" begin="0.2s" repeatCount="1" fill="freeze" />
-                </circle>
-              </g>
-
-              <path 
-                id="active-ray"
-                d={paths[phase]} 
-                fill="none" 
-                stroke={colors[phase]} 
-                strokeWidth="2.5" 
-                strokeLinecap="round"
-                strokeDasharray="1200"
-                strokeDashoffset="1200"
-                filter="url(#wave-glow)"
-              >
-                <animate attributeName="stroke-dashoffset" from="1200" to="0" dur="2.5s" fill="freeze" />
-              </path>
-              
-              <g>
-                {[0, 0.15, 0.3].map((delay, index) => (
-                  <g key={index} filter="url(#wave-glow)" opacity={1 - index * 0.3}>
-                    <path d={`M -${6 + index*4} -${8 + index*3} Q ${4 - index*2} 0, -${6 + index*4} ${8 + index*3}`} fill="none" stroke="#ffffff" strokeWidth={2.5 - index*0.5} strokeLinecap="round" />
-                    <animateMotion dur="2.5s" begin={`${delay}s`} fill="freeze" rotate="auto">
-                      <mpath href="#active-ray" />
-                    </animateMotion>
-                    <animate attributeName="opacity" values={`${1 - index * 0.3};0`} dur="0.1s" begin={`${2.5 + delay}s`} fill="freeze" />
-                  </g>
-                ))}
-              </g>
-
-              <g>
-                <circle cx={endPoint.x} cy={endPoint.y} r="0" fill="none" stroke={colors[phase]} strokeWidth="3.5" filter="url(#wave-glow)" opacity="0">
-                  <animate attributeName="r" values="0;60" dur="1.2s" begin="2.5s" fill="freeze" />
-                  <animate attributeName="opacity" values="0;1;0" keyTimes="0;0.1;1" dur="1.2s" begin="2.5s" fill="freeze" />
-                </circle>
-                <circle cx={endPoint.x} cy={endPoint.y} r="0" fill="none" stroke="#ffffff" strokeWidth="2" filter="url(#wave-glow)" opacity="0">
-                  <animate attributeName="r" values="0;40" dur="1s" begin="2.6s" fill="freeze" />
-                  <animate attributeName="opacity" values="0;1;0" keyTimes="0;0.1;1" dur="1s" begin="2.6s" fill="freeze" />
-                </circle>
-                <circle cx={endPoint.x} cy={endPoint.y} r="5" fill="#ffffff" filter="url(#wave-glow)" opacity="0">
-                  <animate attributeName="opacity" values="0;1;0" keyTimes="0;0.1;1" dur="1s" begin="2.5s" fill="freeze" />
-                </circle>
-                <text x={endPoint.x + 10} y={endPoint.y + 4} fill={colors[phase]} fontSize="14" fontWeight="bold" opacity="0" filter="url(#wave-glow)">
-                  能量抵達
-                  <animate attributeName="opacity" values="0;1;0" keyTimes="0;0.1;1" dur="2s" begin="2.5s" fill="freeze" />
-                  <animate attributeName="y" values={`${endPoint.y + 4};${endPoint.y - 20}`} dur="2s" begin="2.5s" fill="freeze" />
-                </text>
-              </g>
-            </svg>
-          </div>
-        </div>
-      );
-    };
-
-    const Sim35B = () => {
-      const [bounces, setBounces] = useState(0);
-      const [animKey, setAnimKey] = useState(0);
-
-      const handleSelect = (b) => {
-        setBounces(b);
-        setAnimKey(prev => prev + 1);
-      };
-
-      const wavelets = {
-        0: "M 0,80 C 15,80 20,20 40,20 C 60,20 65,80 80,80",
-        1: "M 0,80 C 15,80 20,20 40,20 C 40,20 40,140 40,140 C 60,140 65,80 80,80",
-        2: "M 0,80 C 15,80 20,140 40,140 C 60,140 65,80 80,80"
-      };
-
-      const labels = ["S 波 (0° 原相)", "SS 波 (90° 偏移)", "SSS 波 (180° 倒轉)"];
-      const themeColors = ["#34d399", "#38bdf8", "#f43f5e"];
-
-      return (
-        <div className="bg-slate-900 p-5 md:p-6 rounded-xl border border-slate-700/50 my-6 shadow-xl transition-all duration-300 hover:shadow-cyan-900/10">
-          <h3 className="text-xl font-bold text-amber-400 mb-3 flex items-center tracking-wide">
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-            模擬 3.5-B：表面反射相角動態偏移 (地震儀器紀錄)
-          </h3>
-          <p className="text-[1.05rem] leading-relaxed text-slate-300 mb-6">因鞍點特性，震波每經過一次地表反射產生 90° (π/2) 偏移。請點選不同波相，觀察地震儀器紀錄筆繪製出的真實子波變化。</p>
-          
-          <div className="flex gap-4 mb-6 justify-center">
-            {[0, 1, 2].map(b => (
-              <button 
-                key={b}
-                onClick={() => handleSelect(b)}
-                style={{ borderColor: bounces === b ? themeColors[b] : 'transparent' }}
-                className={`px-5 py-2.5 rounded-lg text-sm font-bold border-2 transition-all duration-300 ease-out
-                  ${bounces === b ? 'bg-slate-800 shadow-[0_0_15px_rgba(255,255,255,0.1)] scale-105' : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200'}`}
-              >
-                <span style={{ color: bounces === b ? themeColors[b] : 'inherit' }}>{labels[b]}</span>
-              </button>
-            ))}
-          </div>
-
-          <div className="relative w-full h-48 md:h-56 bg-slate-950 rounded-lg shadow-inner overflow-hidden border border-slate-800">
-            <svg viewBox="0 0 500 160" className="w-full h-full">
-              <defs>
-                <filter id="neon-glow-35b">
-                  <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
-                  <feMerge>
-                    <feMergeNode in="coloredBlur"/>
-                    <feMergeNode in="SourceGraphic"/>
-                  </feMerge>
-                </filter>
-                <clipPath id={`draw-mask-${animKey}`}>
-                  <rect x="0" y="0" width="0" height="160">
-                    <animate attributeName="width" from="0" to="500" dur="2s" fill="freeze" />
-                  </rect>
-                </clipPath>
-              </defs>
-
-              <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1e293b" strokeWidth="1"/>
-              </pattern>
-              <rect width="100%" height="100%" fill="url(#grid)" />
-              <line x1="0" y1="80" x2="500" y2="80" stroke="#334155" strokeWidth="2" strokeDasharray="4" />
-
-              <g clipPath={`url(#draw-mask-${animKey})`}>
-                <path d="M 0 80 L 200 80" fill="none" stroke={themeColors[bounces]} strokeWidth="3.5" filter="url(#neon-glow-35b)" />
-                <g transform="translate(200, 0)">
-                  <path d={wavelets[bounces]} fill="none" stroke={themeColors[bounces]} strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" filter="url(#neon-glow-35b)" />
-                </g>
-                <path d="M 280 80 Q 300 90 310 80 T 340 80 T 360 85 T 380 80 L 500 80" fill="none" stroke={themeColors[bounces]} strokeWidth="2.5" filter="url(#neon-glow-35b)" />
-              </g>
-
-              <g>
-                <circle cx="0" cy="80" r="5" fill="#ffffff" filter="url(#neon-glow-35b)">
-                   <animate attributeName="cx" values="0;200;280;500" keyTimes="0;0.4;0.56;1" dur="2s" fill="freeze" />
-                   <animate 
-                     attributeName="cy" 
-                     values={
-                       bounces === 0 ? "80;80;20;80;80;80" : 
-                       bounces === 1 ? "80;80;20;140;80;80" : 
-                       "80;80;140;80;80;80"
-                     } 
-                     keyTimes={
-                       bounces === 0 ? "0;0.4;0.48;0.56;0.6;1" : 
-                       bounces === 1 ? "0;0.4;0.44;0.52;0.56;1" : 
-                       "0;0.4;0.48;0.56;0.6;1"
-                     } 
-                     dur="2s" fill="freeze" 
-                   />
-                </circle>
-              </g>
-              <text x="12" y="28" fill={themeColors[bounces]} fontSize="14" fontWeight="bold" opacity="0.9">
-                紀錄波相：{labels[bounces]}
-              </text>
-            </svg>
-          </div>
-        </div>
-      );
-    };
-
-    const Sim36A = () => {
-      const [thickness, setThickness] = useState(50);
-      return (
-        <div className="bg-slate-900 p-5 md:p-6 rounded-xl border border-slate-700/50 my-6 shadow-lg transition-all duration-300 hover:shadow-cyan-900/10">
-          <h3 className="text-xl font-bold text-amber-400 mb-3 tracking-wide">模擬 3.6-A：剪力波分裂 (Shear Wave Splitting)</h3>
-          <p className="text-[1.05rem] leading-relaxed text-slate-300 mb-5">進入非均向介質後，快波(紅)與慢波(藍)產生延遲時間 δt。厚度越大延遲越明顯。</p>
-          <input type="range" min="10" max="100" value={thickness} onChange={(e) => setThickness(Number(e.target.value))} className="w-full mb-6 accent-cyan-500 cursor-pointer" />
-          <svg viewBox="0 0 400 80" className="w-full h-24 bg-slate-800 rounded-lg shadow-inner border border-slate-700/50">
-            <path d="M 0 40 Q 20 10 40 40 T 80 40 T 120 40" fill="none" stroke="#ef4444" strokeWidth="2.5" className="transition-all duration-300" />
-            <g transform={`translate(-${thickness}, 0)`} className="transition-all duration-300">
-              <path d="M 0 40 Q 20 70 40 40 T 80 40 T 120 40 T 160 40" fill="none" stroke="#3b82f6" strokeWidth="2.5" strokeDasharray="5" />
-            </g>
-            <line x1="120" y1="20" x2={120-thickness} y2="20" stroke="#facc15" strokeWidth="2.5" className="transition-all duration-300" />
-            <text x={120 - thickness/2 - 5} y="15" fill="#facc15" fontSize="12" fontWeight="bold" className="transition-all duration-300">δt</text>
-          </svg>
-        </div>
-      );
-    };
-
-    const Sim36B = () => {
-      const [azimuth, setAzimuth] = useState(0);
-      const rad = (azimuth * Math.PI) / 180;
-      const vx = Math.cos(rad) * 80; 
-      const vy = Math.sin(rad) * 40; 
-      const speed = Math.sqrt(vx*vx + vy*vy);
-      return (
-        <div className="bg-slate-900 p-5 md:p-6 rounded-xl border border-slate-700/50 my-6 shadow-lg transition-all duration-300 hover:shadow-cyan-900/10">
-          <h3 className="text-xl font-bold text-amber-400 mb-3 tracking-wide">模擬 3.6-B：方位非均向性 (Azimuthal Anisotropy)</h3>
-          <p className="text-[1.05rem] leading-relaxed text-slate-300 mb-5">波速隨方位角改變。洋脊擴張時，橄欖石快軸平行擴張方向。目前波速: <span className="font-mono text-cyan-300">{speed.toFixed(1)}</span></p>
-          <input type="range" min="0" max="360" value={azimuth} onChange={(e) => setAzimuth(Number(e.target.value))} className="w-full mb-6 accent-cyan-500 cursor-pointer" />
-          <div className="flex justify-center relative">
-            <svg width="200" height="200" viewBox="0 0 200 200" className="bg-slate-800 rounded-lg shadow-inner border border-slate-700/50">
-              <ellipse cx="100" cy="100" rx="80" ry="40" fill="#1e293b" stroke="#475569" strokeDasharray="4" />
-              <line x1="100" y1="100" x2={100 + vx} y2={100 - vy} stroke="#f43f5e" strokeWidth="3.5" markerEnd="url(#arrow)" className="transition-all duration-200" />
-              <text x="10" y="20" fill="#94a3b8" fontSize="12" fontWeight="bold">快軸 (水平)</text>
-              <text x="10" y="190" fill="#94a3b8" fontSize="12" fontWeight="bold">慢軸 (垂直)</text>
-            </svg>
-          </div>
-        </div>
-      );
-    };
-
-    const Sim37A = () => {
-      const [q, setQ] = useState(10);
-      const generateDampedWave = () => Array.from({length: 200}).map((_, i) => {
-        const x = i * 2;
-        const y = 50 + 40 * Math.exp(-i / q) * Math.sin(i * 0.5);
-        return `${x},${y}`;
-      }).join(' ');
-      return (
-        <div className="bg-slate-900 p-5 md:p-6 rounded-xl border border-slate-700/50 my-6 shadow-lg transition-all duration-300 hover:shadow-cyan-900/10">
-          <h3 className="text-xl font-bold text-amber-400 mb-3 tracking-wide">模擬 3.7-A：本質衰減 (Intrinsic Attenuation)</h3>
-          <p className="text-[1.05rem] leading-relaxed text-slate-300 mb-5">阻尼諧振子模型：Q 值越大阻尼越小，波傳遞得越遠。當前 Q: <span className="font-mono text-cyan-300">{q}</span></p>
-          <input type="range" min="5" max="100" value={q} onChange={(e) => setQ(Number(e.target.value))} className="w-full mb-6 accent-cyan-500 cursor-pointer" />
-          <svg viewBox="0 0 400 100" className="w-full h-32 bg-slate-800 rounded-lg shadow-inner border border-slate-700/50">
-            <polyline points={generateDampedWave()} fill="none" stroke="#34d399" strokeWidth="2.5" className="transition-all duration-300" />
-          </svg>
-        </div>
-      );
-    };
-
-    const Sim37B = () => {
-      const [dist, setDist] = useState(20);
-      return (
-        <div className="bg-slate-900 p-5 md:p-6 rounded-xl border border-slate-700/50 my-6 shadow-lg transition-all duration-300 hover:shadow-cyan-900/10">
-          <h3 className="text-xl font-bold text-amber-400 mb-3 tracking-wide">模擬 3.7-B：幾何擴散 (Geometric Spreading)</h3>
-          <p className="text-[1.05rem] leading-relaxed text-slate-300 mb-5">隨距離增加，波前總能量守恆但面積擴大，導致振幅隨 1/r 衰減。距離: <span className="font-mono text-cyan-300">{dist}</span></p>
-          <input type="range" min="10" max="100" value={dist} onChange={(e) => setDist(Number(e.target.value))} className="w-full mb-6 accent-cyan-500 cursor-pointer" />
-          <div className="flex justify-center relative">
-            <svg width="200" height="200" viewBox="0 0 200 200" className="bg-slate-800 rounded-lg shadow-inner border border-slate-700/50">
-              <circle cx="100" cy="100" r={dist} fill="none" stroke={`rgba(6, 182, 212, ${10/dist})`} strokeWidth="4" className="transition-all duration-300" />
-              <circle cx="100" cy="100" r="4" fill="#f87171" />
-            </svg>
-          </div>
-        </div>
-      );
-    };
-
-    const Sim38A = () => {
-      const [depth, setDepth] = useState(300);
-      const getPhase = (d) => {
-        if (d < 410) return "橄欖石 (Olivine, α相)";
-        if (d < 520) return "瓦茲利石 (Wadsleyite, β相)";
-        if (d < 660) return "林伍德石 (Ringwoodite, γ相)";
-        return "鈣鈦礦 (Perovskite) + 方鎂石";
-      };
-      return (
-        <div className="bg-slate-900 p-5 md:p-6 rounded-xl border border-slate-700/50 my-6 shadow-lg transition-all duration-300 hover:shadow-cyan-900/10">
-          <h3 className="text-xl font-bold text-amber-400 mb-3 tracking-wide">模擬 3.8-A：地函礦物相變與波速躍升</h3>
-          <p className="text-[1.05rem] leading-relaxed text-slate-300 mb-6">隨著壓力增加，結晶構造緻密化，導致震波速度跳升。</p>
-          <div className="flex gap-6 items-center">
-            <input type="range" min="300" max="800" value={depth} onChange={(e) => setDepth(Number(e.target.value))} className="w-8 h-40 md:h-48 accent-cyan-500 cursor-pointer" style={{writingMode: 'vertical-lr'}} />
-            <div className="flex-1 bg-slate-800/50 p-4 rounded-lg border border-slate-700/50">
-              <p className="text-cyan-300 mb-2 font-medium">深度: <span className="font-mono text-lg">{depth} km</span></p>
-              <p className="text-xl md:text-2xl text-amber-200 font-bold mb-5">{getPhase(depth)}</p>
-              <svg viewBox="0 0 200 150" className="w-full h-32 md:h-40 bg-slate-800 rounded-lg shadow-inner border border-slate-700/50">
-                <polyline points="20,20 20,40 60,40 60,70 100,70 100,110 160,110 160,150" fill="none" stroke="#64748b" strokeWidth="2.5" />
-                <circle cx={depth<410?20: depth<520?60: depth<660?100: 160} cy={(depth-300)/500 * 150} r="6" fill="#f43f5e" className="transition-all duration-300" />
-                <text x="25" y="45" fill="#94a3b8" fontSize="10" fontWeight="bold">410km</text>
-                <text x="65" y="75" fill="#94a3b8" fontSize="10" fontWeight="bold">520km</text>
-                <text x="105" y="115" fill="#94a3b8" fontSize="10" fontWeight="bold">660km</text>
-              </svg>
-            </div>
-          </div>
-        </div>
-      );
-    };
-
-    const Sim38B = () => {
-      const [tempAnomaly, setTempAnomaly] = useState(0);
-      return (
-        <div className="bg-slate-900 p-5 md:p-6 rounded-xl border border-slate-700/50 my-6 shadow-lg transition-all duration-300 hover:shadow-cyan-900/10">
-          <h3 className="text-xl font-bold text-amber-400 mb-3 tracking-wide">模擬 3.8-B：地溫梯度與 ULVZ 形成</h3>
-          <p className="text-[1.05rem] leading-relaxed text-slate-300 mb-5">增加核函邊界(CMB)的熱異常。當地溫曲線(紅)超越固相線(黃)，岩石將局部熔融。</p>
-          <input type="range" min="0" max="50" value={tempAnomaly} onChange={(e) => setTempAnomaly(Number(e.target.value))} className="w-full mb-6 accent-cyan-500 cursor-pointer" />
-          <svg viewBox="0 0 200 100" className="w-full h-32 md:h-40 bg-slate-800 rounded-lg shadow-inner border border-slate-700/50">
-            <polyline points="20,90 80,60 180,30" fill="none" stroke="#facc15" strokeWidth="2.5" strokeDasharray="4" />
-            <polyline points={`10,90 50,70 ${160+tempAnomaly},40`} fill="none" stroke="#ef4444" strokeWidth="2.5" className="transition-all duration-300" />
-            <text x="10" y="15" fill="#facc15" fontSize="10" fontWeight="bold">黃線：固相線(熔點)</text>
-            <text x="10" y="28" fill="#ef4444" fontSize="10" fontWeight="bold">紅線：地溫梯度</text>
-            {tempAnomaly > 30 && <circle cx="180" cy="30" r="12" fill="#f97316" opacity="0.7" className="transition-opacity duration-500" />}
-            {tempAnomaly > 30 && <text x="110" y="25" fill="#f97316" fontSize="10" fontWeight="bold" className="transition-opacity duration-500">超低速帶 ULVZ</text>}
-          </svg>
-        </div>
-      );
-    };
-
-    // -------------------------------------------------------------
-    // 主應用程式 App 元件
-    // -------------------------------------------------------------
-    function App() {
-      const [activeTab, setActiveTab] = useState(chapterData[0].id);
-      const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
-      const activeContent = chapterData.find(c => c.id === activeTab);
-
-      const renderSimulation = (simId) => {
-        switch (simId) {
-          case 'sim31A': return <Sim31A key={simId} />;
-          case 'sim31B': return <Sim31B key={simId} />;
-          case 'sim32A': return <Sim32A key={simId} />;
-          case 'sim32B': return <Sim32B key={simId} />;
-          case 'sim33A': return <Sim33A key={simId} />;
-          case 'sim33B': return <Sim33B key={simId} />;
-          case 'sim34A': return <Sim34A key={simId} />;
-          case 'sim34B': return <Sim34B key={simId} />;
-          case 'sim35A': return <Sim35A key={simId} />;
-          case 'sim35B': return <Sim35B key={simId} />;
-          case 'sim36A': return <Sim36A key={simId} />;
-          case 'sim36B': return <Sim36B key={simId} />;
-          case 'sim37A': return <Sim37A key={simId} />;
-          case 'sim37B': return <Sim37B key={simId} />;
-          case 'sim38A': return <Sim38A key={simId} />;
-          case 'sim38B': return <Sim38B key={simId} />;
-          default: return null;
-        }
-      };
-
-      return (
-        <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col overflow-hidden selection:bg-cyan-900 selection:text-cyan-50">
-          
-          <header className="shrink-0 flex items-center justify-between px-6 py-5 border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm z-20 shadow-md">
-            <div className="flex items-center gap-4">
-              <button 
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="p-2.5 text-slate-400 hover:text-cyan-400 hover:bg-slate-800 rounded-lg transition-all duration-300 ease-out outline-none"
-                title="開關目錄"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
-              <h1 className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 tracking-wide drop-shadow-sm">
-                地震學與地球結構分析系統
-              </h1>
-            </div>
-          </header>
-
-          <div className="flex flex-1 overflow-hidden relative">
-            <aside 
-              className={`absolute lg:relative z-10 h-full bg-slate-950 border-r border-slate-800 shrink-0 transition-transform duration-500 cubic-bezier(0.4, 0, 0.2, 1)
-                ${isSidebarOpen ? 'translate-x-0 w-72 shadow-2xl lg:shadow-none' : '-translate-x-full w-0'}`}
-            >
-              <nav className="p-5 flex flex-col gap-3 overflow-y-auto h-full scrollbar-hide bg-slate-900/30">
-                {chapterData.map((chapter) => (
-                  <button
-                    key={chapter.id}
-                    onClick={() => {
-                      setActiveTab(chapter.id);
-                      if(window.innerWidth < 1024) setIsSidebarOpen(false);
-                    }}
-                    className={`text-left px-5 py-3.5 rounded-xl text-[1.05rem] font-medium transition-all duration-300 ease-out border
-                      ${activeTab === chapter.id 
-                        ? 'bg-cyan-950/60 text-cyan-300 border-cyan-700/80 shadow-[0_0_20px_rgba(6,182,212,0.15)] scale-[1.02]' 
-                        : 'bg-slate-900/80 text-slate-400 border-slate-800 hover:bg-slate-800 hover:text-slate-200 hover:border-slate-700'
-                      }`}
-                  >
-                    {chapter.title}
-                  </button>
-                ))}
-              </nav>
-            </aside>
-
-            {isSidebarOpen && (
-              <div 
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm z-0 lg:hidden transition-opacity duration-500"
-                onClick={() => setIsSidebarOpen(false)}
-              />
-            )}
-
-            <main className="flex-1 overflow-y-auto p-6 md:p-10 relative z-0 bg-slate-950 scroll-smooth">
-              <div className="max-w-5xl mx-auto pb-24 transition-all duration-500">
-                
-                <div className="mb-10 border-l-[6px] border-cyan-500 pl-6 bg-gradient-to-r from-cyan-950/40 to-transparent py-6 pr-6 rounded-r-2xl shadow-sm">
-                  <h2 className="text-3xl font-bold text-white mb-4 tracking-wide">{activeContent.title}</h2>
-                  <p className="text-slate-300 leading-loose text-[1.05rem] md:text-lg">
-                    {activeContent.summary}
-                  </p>
-                </div>
-
-                <div className="space-y-12">
-                  {activeContent.sections.map((sec, idx) => (
-                    <section key={idx} className="prose prose-invert max-w-none">
-                      <h3 className="text-xl md:text-2xl font-bold text-cyan-300 mb-5 pb-3 border-b border-slate-700/60 tracking-wide">
-                        {sec.heading}
-                      </h3>
-                      <div className="text-slate-200/90 leading-loose space-y-6 text-[1.05rem] md:text-lg tracking-wide whitespace-pre-wrap">
-                        {sec.content}
-                      </div>
-                      
-                      {sec.images && sec.images.length > 0 && (
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-10">
-                          {sec.images.map((img, i) => (
-                            <figure key={i} className="bg-slate-900/80 p-5 rounded-2xl border border-slate-700/60 shadow-xl flex flex-col h-full transition-all duration-300 hover:shadow-cyan-900/20 hover:border-slate-600">
-                              <div className="w-full h-72 flex items-center justify-center bg-slate-800/80 rounded-xl mb-5 overflow-hidden shadow-inner border border-slate-700/50">
-                                <img 
-                                  src={img.src} 
-                                  alt={img.alt} 
-                                  className="max-w-full max-h-full object-contain p-2 hover:scale-[1.02] transition-transform duration-500" 
-                                  loading="lazy" 
-                                />
-                              </div>
-                              <figcaption className="text-base text-slate-300 leading-relaxed mt-auto border-t border-slate-700/50 pt-4 font-medium tracking-wide">
-                                {img.desc}
-                              </figcaption>
-                            </figure>
-                          ))}
-                        </div>
-                      )}
-                    </section>
-                  ))}
-                </div>
-
-                {activeContent.simulations && activeContent.simulations.length > 0 && (
-                  <div className="mt-16 pt-8 border-t border-slate-800">
-                    <h4 className="text-amber-400 text-2xl font-bold uppercase tracking-widest mb-8 flex items-center">
-                      <svg className="w-7 h-7 mr-3 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                      </svg>
-                      互動教學動態模擬區
-                    </h4>
-                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                      {activeContent.simulations.map(simId => renderSimulation(simId))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="mt-16 pt-8 border-t border-slate-800 bg-slate-900/30 p-6 rounded-2xl">
-                  <h4 className="text-slate-400 text-sm font-bold uppercase tracking-widest mb-3">章節總結</h4>
-                  <p className="text-slate-300 text-[1.05rem] leading-loose italic tracking-wide">
-                    {activeContent.conclusion}
-                  </p>
-                </div>
-                
-              </div>
-            </main>
-
-          </div>
-        </div>
-      );
-    }
-
-    // 將 App 元件渲染至根節點
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
   </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    /* 自訂捲軸隱藏與優化樣式 */
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    /* 針對 MathJax 公式區塊的自訂微調，確保排版不擁擠 */
+    mjx-container[display="true"] {
+      margin: 1.5em 0 !important;
+      padding: 1em 0;
+      background: rgba(15, 23, 42, 0.3);
+      border-radius: 0.5rem;
+      border: 1px solid rgba(51, 65, 85, 0.4);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans selection:bg-cyan-900 selection:text-cyan-50">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // --- 資料層：完整收錄 3.1 至 3.8 章節內容 ---
+    const chapterData = [
+      {
+        id: '3.1',
+        title: '3.1 導論：地震學與地球結構',
+        summary: '探討地震學在解析地球內部構造上的核心地位。地震波是窺探地球深處狀態的「透視鏡」，透過解決走時（Travel Time）的逆向問題，推導地球內部速度分佈與分層結構。',
+        sections: [
+          {
+            heading: '一、 地震學解析力與地球內部模型',
+            content: `地震學的核心在於測定地震波傳遞速度（$v_p, v_s$），推導彈性特徵。\n\n優勢：重力與地磁僅能提供模糊約束；地震波能精準標定邊界。例如核函邊界（CMB），P波速急降且S波無法穿透（$v_s = 0$），直接證明外核為液態。地震學確立了地球「分層結構」，為物質分化作用提供鐵證。`
+          },
+          {
+            heading: '二、 走時：正向與逆向問題',
+            content: `地震波走時 $T$ 是路徑上「慢度 $p$」（Slowness, $p = 1/v$）的線積分：\n$$ T = \\int_{\\Gamma} \\frac{1}{v(s)} ds = \\int_{\\Gamma} p \\, ds $$\n\n- 正向問題：已知速度結構求走時。\n- 逆向問題：從地表觀測走時反推地下速度結構。因單一射線僅提供整體積分結果，需仰賴大量不同震源-測站的觀測組合進行逆向求解。`
+          },
+          {
+            heading: '三、 模型演進與折射震測基礎',
+            content: `模型演進：平坦層狀模型 $\\rightarrow$ 球體幾何模型 $\\rightarrow$ 非均向性與非彈性（衰減 Q）。\n\n折射震測假設水平等速地層，主要波型：\n1. 直達波：$T = x/v_0$。\n2. 反射波：依循反射定律。\n3. 頭波（折射波）：臨界入射角 $i_c$ 滿足 $\\sin i_c = v_0 / v_1$，波沿介面滑行並激發波傳回地表。`
+          }
+        ],
+        conclusion: '這份講義雖然是簡短的導論，卻精確點出了地震學的核心價值：透過解譯地震波的走時與波形，解決困難的地球物理逆向問題。從最簡單的平坦分層模型，一路延伸到能夠解析液態外核與地函邊界特性的複雜模型，地震學為我們描繪出了一幅清晰的地球內部畫像。',
+        simulations: ['sim31A', 'sim31B']
+      },
+      {
+        id: '3.2',
+        title: '3.2 折射震測學',
+        summary: '探討平坦與傾斜層狀模型中的走時特徵，介紹莫氏不連續面（Moho）發現過程與盲區挑戰，並結合岩石學解釋地殼結構差異。',
+        sections: [
+          {
+            heading: '一、 平坦層狀模型與莫氏不連續面',
+            content: `在單一水平層（厚度 $h$）模型中：\n- 直達波走時：$T(x) = \\frac{x}{v_0}$\n- 反射波走時：$T(x) = \\sqrt{t_0^2 + \\frac{x^2}{v_0^2}} \\quad (t_0 = \\frac{2h}{v_0})$\n- 頭波走時：$T(x) = \\frac{x}{v_1} + \\tau_1 \\quad (\\tau_1 = 2h\\sqrt{\\frac{1}{v_0^2} - \\frac{1}{v_1^2}})$\n\n交會距離（Crossover Distance）後，頭波超越直達波成為首波。`,
+            images: [
+              { src: '螢幕擷取畫面 2026-05-02 235506.png', alt: '折射震測走時剖面', desc: '折射震測經典走時剖面。標示出淺層直達波 (Pg)、深部頭波 (Pn) 及 Moho 反射波 (PmP) 走時曲線特徵與交會現象。' }
+            ]
+          },
+          {
+            heading: '二、 莫氏不連續面 (Moho) 的發現',
+            content: `1909 年，Mohorovičić 區分出地殼直達波 (Pg) 與地函頭波 (Pn)，確立了區分地殼與地函的「莫氏不連續面 (Moho)」。`
+          },
+          {
+            heading: '三、 傾斜層狀模型 (Dipping Layer Method)',
+            content: `當地下介面存在傾角 $\\theta$ 時，需進行反轉剖面 (Reversed Profile) 實驗。\n根據幾何推導，順傾與逆傾的視速度滿足：\n$$ v_{down} = \\frac{v_0}{\\sin(i_c + \\theta)} < v_1 $$\n$$ v_{up} = \\frac{v_0}{\\sin(i_c - \\theta)} > v_1 $$\n利用兩個方向的視速度與截距時間差異，可推算真實傾角 $\\theta$ 與介面深度。`
+          },
+          {
+            heading: '四、 資料分析的限制與盲區 (Blind Zones)',
+            content: `逆向問題的盲區：\n1. 低速層（Low-Velocity Layer）：若 $v_n < v_{n-1}$，射線向下偏折無臨界折射，導致下層深度被嚴重高估。\n2. 盲區（Blind Zone）：地層太薄或速度差異太小，其頭波永遠無法在任何距離上成為「首波」。`
+          },
+          {
+            heading: '五、 地殼結構與岩石學特徵',
+            content: `地殼結構差異：\n- 海洋地殼：約 7km 厚，玄武岩/輝長岩為主。\n- 大陸地殼：30-70km 厚以支撐地殼均衡 (Isostasy)。\n\n火成岩波速 $v_p$ 與 $SiO_2$ 含量成反比。上部地函主要由具非均向性的橄欖岩構成。`
+          }
+        ],
+        conclusion: '科學家逐步發展出針對傾斜地層、低速層盲區的分析方法，並結合振幅資訊，將速度剖面轉換為充滿化學意義的地球構造剖面。',
+        simulations: ['sim32A', 'sim32B']
+      },
+      {
+        id: '3.3',
+        title: '3.3 反射震測學',
+        summary: '探討反射震測學核心理論，包含 NMO 校正、CMP 疊加、去迴旋與逆向偏移成像，提供精細的地層解析度。',
+        sections: [
+          {
+            heading: '一、 反射波與正常時差 (NMO)',
+            content: `雙曲線走時與正常時差（NMO, $\\Delta T$）：\n$$ T(x)^2 = t_0^2 + \\frac{x^2}{v_{rms}^2} \\implies \\Delta T \\approx \\frac{x^2}{2 v_{rms}^2 t_0} $$\n多層結構中，可透過 Dix 方程式由兩層的均方根速度反求區間速度：\n$$ v_{int}^2 = \\frac{v_2^2 t_2 - v_1^2 t_1}{t_2 - t_1} $$`,
+            images: [
+              { src: 'image_a315ff.png', alt: '多層水平地層反射射線幾何圖', desc: '多層地層的反射幾何。此模型為推導雙曲線走時、Dix 方程式與 NMO 的基礎。' }
+            ]
+          },
+          {
+            heading: '二、 截距-慢度空間轉換 (τ-p Formulation)',
+            content: `$\\tau-p$ 空間轉換（截距-慢度）：\n定義 $\\tau = T - px$。反射波的雙曲線在此空間中會映射為橢圓：\n$$ \\frac{p^2}{1/v^2} + \\frac{\\tau^2}{t_0^2} = 1 $$\n直達波與頭波則收斂為點，易於在 $\\tau-p$ 空間中濾除表面波等線性干擾。`
+          },
+          {
+            heading: '三、 共中點疊加 (CMP Stacking)',
+            content: `將地下同一反射點的多頻道觀測紀錄，利用疊加速度進行 NMO 校正對齊。疊加（Stacking）後，反射波因建設性干涉而增強，速度不同的雜訊（如多次反射波）則互相抵消，最終產出高訊噪比的零支距剖面。`
+          },
+          {
+            heading: '四、 去迴旋 (Deconvolution)',
+            content: `地震紀錄可視為震源波列 $W(t)$ 與地下反射係數序列 $R(t)$ 的卷積：\n$$ S(t) = W(t) * R(t) $$\n去迴旋透過設計反相濾波器剝離 $W(t)$，使反射訊號「尖銳化」（逼近 Delta 函數），大幅提升垂直解析度。`
+          },
+          {
+            heading: '五、 逆向偏移 (Migration) 與真實成像',
+            content: `未處理的時間剖面有繞射尾巴，且傾斜地層視傾角偏緩。逆向偏移利用「爆炸反射面模型」，修正波動幾何效應：\n$$ \\tan \\theta_{true} = \\frac{\\tan \\theta_{app}}{\\cos \\theta_{app}} $$\n透過波場向下延拓消除繞射尾巴，將傾斜地層歸位至真實深度的幾何影像。`
+          }
+        ],
+        conclusion: '反射震測學提供精細的地質「X光片」。本節詳述了從野外多頻道觀測、空間轉換到波動力達成像的完整體系，為解析深部構造提供無可替代的工具。',
+        simulations: ['sim33A', 'sim33B']
+      },
+      {
+        id: '3.4',
+        title: '3.4 球體地球中的地震波',
+        summary: '推廣至球體幾何。探討球座標司乃耳定律、速度分佈對走時特徵的影響，與 Herglotz-Wiechert 反演積分。',
+        sections: [
+          {
+            heading: '一、 球體司乃耳定律與射線參數',
+            content: `球體模型中，射線參數被修正為包含半徑 $r$ 的形式：\n$$ p = \\frac{r \\sin i}{v} = \\text{constant} $$\n隨深度增加波速變快，$\\sin i$ 增大。當 $i=90^\\circ$ 時達射線最深點（Bottoming point），此時 $p = r_p / v_p$。`,
+            images: [
+              { src: 'image_a31319.png', alt: '球體司乃耳定律與射線幾何圖', desc: '球體司乃耳定律與射線幾何圖。射線穿越同心球體分層時，射線參數 p 沿路徑恆定不變。' }
+            ]
+          },
+          {
+            heading: '二、 走時曲線與射線參數的積分關係',
+            content: `角距離 $\\Delta$ 與走時 $T$ 之積分關係：\n$$ \\Delta(p) = \\int \\frac{p}{r \\sqrt{(r/v)^2 - p^2}} dr \\quad,\\quad T(p) = \\int \\frac{r/v^2}{\\sqrt{(r/v)^2 - p^2}} dr $$\n走時曲線的斜率即為射線參數：$p = \\frac{dT}{d\\Delta}$。`
+          },
+          {
+            heading: '三、 速度分佈效應對走時的影響',
+            content: `1. 緩慢增加：走時曲線向下凹（$d^2T/d\\Delta^2 < 0$）。\n2. 急遽增加（相變帶）：射線強烈向上偏折，造成「三重走時（Triplication）」與焦散現象。\n3. 低速帶：當波速下降滿足 $\\frac{dv}{dr} > \\frac{v}{r}$，波將向下偏折無法折返，在地表造成「陰影區（Shadow Zone）」。`
+          },
+          {
+            heading: '四、 Herglotz-Wiechert 積分反演',
+            content: `從走時觀測反推速度分佈的經典解析解：\n$$ \\ln\\left(\\frac{R}{r_1}\\right) = \\frac{1}{\\pi} \\int_{0}^{\\Delta_1} \\cosh^{-1}\\left(\\frac{p(\\Delta)}{p_1}\\right) d\\Delta $$\n可直接計算反轉深度與波速，但在遭遇低速帶時因缺乏射線資訊而失效。`
+          }
+        ],
+        conclusion: '透過球體射線幾何與積分公式，闡明了相變與低速帶如何投射出三重走時與陰影區等奇異現象。為建立全球標準地球模型奠定基礎。',
+        simulations: ['sim34A', 'sim34B']
+      },
+      {
+        id: '3.5',
+        title: '3.5 體波走時研究',
+        summary: '利用體波建構地球精細分層。涵蓋體波相命名、表面反射相移、地核陰影區與 D″ 層的複雜波動場。',
+        sections: [
+          {
+            heading: '一、 全球地球模型與體波命名規則',
+            content: `命名規則：\n- 地函：P, S\n- 穿透地核：K(外核P), I(內核P), J(內核S)\n- 邊界反射：c(CMB), i(ICB)\n- 深源向上反射：p, s（利用 pP-P 時間差可推算震源深度）\n- 重複字母：地表多次反射（如 PP, SSS）。`,
+            images: [
+              { src: 'Fig3.5-1_1.png', alt: '圖 3.5-1', desc: '圖 3.5-1：震波速度模型 (JB vs IASP91)，見 CMB 波速驟降。' },
+              { src: 'Fig3.5-2_2.png', alt: '圖 3.5-2(a)', desc: '圖 3.5-2(a)：震源至測站的重要波相，包含 pP, PP, ScS 等。' },
+              { src: 'Fig3.5-2_3.png', alt: '圖 3.5-2(b)', desc: '圖 3.5-2(b)：實際觀測之地震波形紀錄 (Seismogram)。' },
+              { src: 'Fig3.5-3_2.png', alt: '圖 3.5-3', desc: '圖 3.5-3：全球體波走時曲線圖，橫軸為距離，縱軸為時間。' }
+            ]
+          },
+          {
+            heading: '二、 表面反射波與相角偏移 (Phase Shift)',
+            content: `表面反射波（如 PP, SS）在距離上是最大走時，在方位上是最小走時，具有「鞍點（Saddle point）」特性。根據波傳理論，每次地表反射會產生 $\\pi/2$ 相角偏移，對應於希爾伯特轉換 (Hilbert Transform)：\n$$ u_{shift}(t) = \\mathcal{H}[u(t)] = \\frac{1}{\\pi} \\mathcal{P} \\int_{-\\infty}^{\\infty} \\frac{u(\\tau)}{t-\\tau} d\\tau $$\n導致 SS 波形失真，SSS 波形則上下顛倒。`,
+            images: [
+              { src: 'Fig3.5-4_1.png', alt: '圖 3.5-4(a)', desc: '圖 3.5-4(a)：穿越地球整體的全域射線路徑。' },
+              { src: 'Fig3.5-4_2.png', alt: '圖 3.5-4(b)', desc: '圖 3.5-4(b)：PP 波在地表發生反射的射線幾何特性。' },
+              { src: 'Fig3.5-4_3.png', alt: '圖 3.5-4(c)', desc: '圖 3.5-4(c)：PP 波鞍點特性解析（距離最大走時，方位最小走時）。' }
+            ]
+          },
+          {
+            heading: '三、 地核相與陰影區',
+            content: `核函邊界 (CMB) 液態外核低速造成 $98^\\circ \\sim 145^\\circ$ 的 P 波幾何陰影區。陰影區內可觀測：\n1. 繞射波 (Pdiff, Sdiff)。\n2. 內核波 (PKIKP)。\n3. 散射產生的 PKP 前兆波。`,
+            images: [
+              { src: 'Fig3.5-6_1.png', alt: '圖 3.5-6(a)', desc: '圖 3.5-6(a)：PKP 與 PKIKP 走時曲線分支。' },
+              { src: 'Fig3.5-6_2.png', alt: '圖 3.5-6(b)', desc: '圖 3.5-6(b)：穿透內核的 PKIKP 射線路徑密集分佈。' },
+              { src: 'Fig3.5-6_5.png', alt: '圖 3.5-6(c)', desc: '圖 3.5-6(c)：進入陰影區邊緣的波傳行為。' }
+            ]
+          },
+          {
+            heading: '四、 上地函構造',
+            content: `地震岩石圈下方存在低速帶 (LVZ)，對應軟流圈。在 410km 與 660km 處因礦物高壓相變，波速急升造成顯著的三重走時現象。`
+          },
+          {
+            heading: '五、 下地函與 D″ 層',
+            content: `CMB 上方 200-300km 的 D″ 層是複雜的熱化學邊界層。存在 D″ 不連續面，且其底部極薄區域波速急降，稱為超低速帶 (ULVZ, 觀測相如 SPdKS)，極可能為局部熔融。`,
+            images: [
+              { src: 'Fig3.5-12_1.png', alt: '圖 3.5-12(a)', desc: '圖 3.5-12(a)：地函深部剖面模型顯示 D″ 層異常。' },
+              { src: 'Fig3.5-12_2.png', alt: '圖 3.5-12(b)', desc: '圖 3.5-12(b)：觀測到 S, Scd 與 ScS 波形。' },
+              { src: 'Fig3.5-12_3.png', alt: '圖 3.5-12(c)', desc: '圖 3.5-12(c)：合成地震圖 (Synthetic Seismograms)。' },
+              { src: 'Fig3.5-12_4.png', alt: '圖 3.5-12(d)', desc: '圖 3.5-12(d)：D″ 層內的波傳幾何路徑。' },
+              { src: 'Fig3.5-12_6.png', alt: '圖 3.5-12(e)', desc: '圖 3.5-12(e)：不同構造環境下 D″ 層速度模型。' },
+              { src: 'Fig3.5-13_2.png', alt: '圖 3.5-13', desc: '圖 3.5-13：SPdKS 與 SKPdS 於 CMB 的繞射路徑。' }
+            ]
+          },
+          {
+            heading: '六、 超越射線理論：真實的波動場',
+            content: `全波場模擬顯示，波在地球內部會被不斷切割、繞射與干涉。真實波場包含豐富的物理行為（如繞射與相角偏移），並非單純的高頻幾何射線軌跡能完全表達。`,
+            images: [
+              { src: 'Fig3.5-14_1.png', alt: '圖 3.5-14(a)', desc: '圖 3.5-14(a)：全波場模擬 (1500 s)，波前干涉現象。' },
+              { src: 'Fig3.5-14_2.png', alt: '圖 3.5-14(b)', desc: '圖 3.5-14(b)：全波場模擬 (1200 s)，複雜反射波。' },
+              { src: 'Fig3.5-14_3.png', alt: '圖 3.5-14(c)', desc: '圖 3.5-14(c)：全波場模擬 (1800 s)，尾波與多次繞射。' },
+              { src: 'Fig3.5-14_4.png', alt: '圖 3.5-14(d)', desc: '圖 3.5-14(d)：震波初次抵達對蹠點區域。' }
+            ]
+          }
+        ],
+        conclusion: '透過解讀複雜體波相，精準測繪過渡帶起伏、地核分界及 D″ 層謎團。體波走時觀測證實了地球層圈結構。',
+        simulations: ['sim35A', 'sim35B']
+      },
+      {
+        id: '3.6',
+        title: '3.6 地球的非均向性結構',
+        summary: '打破等向性假設，探討非均向性（Anisotropy）對波傳的影響。介紹 SPO 與 LPO，詳細說明橫向等向性、方位非均向性與剪力波分裂現象。',
+        sections: [
+          {
+            heading: '一、 非均向性的基本概念與來源',
+            content: `非均向性 (Anisotropy) 即介質性質隨方向改變，廣義虎克定律描述為：\n$$ \\sigma_{ij} = c_{ijkl} \\epsilon_{kl} $$\n1. 形狀優選方位 (SPO)：巨觀構造排列（如沉積層、平行裂隙）。\n2. 晶格優選方位 (LPO)：岩石受剪力變形，橄欖石等微觀礦物晶體順應力定向排列。`
+          },
+          {
+            heading: '二、 橫向等向性與剪力波分裂',
+            content: `橫向等向性 (Transverse Isotropy)：具旋轉對稱軸（通常為垂直方向），SH 波速通常大於 SV 波速。\n\n剪力波分裂 (Shear Wave Splitting)：\n剪力波進入非均向介質分解為沿「快軸」與「慢軸」的正交分量。延遲時間 $\\delta t$ 與層厚 $L$ 相關：\n$$ \\delta t = L \\left( \\frac{1}{v_{slow}} - \\frac{1}{v_{fast}} \\right) $$`,
+            images: [
+              { src: 'image_a31281.png', alt: '剪力波極化與橫向等向性示意圖', desc: '剪力波極化與橫向等向性幾何示意圖。解釋剪力波分裂（Shear Wave Splitting）機制的基礎物理模型。' }
+            ]
+          },
+          {
+            heading: '三、 方位非均向性與岩石圈動力學',
+            content: `方位非均向性 (Azimuthal Anisotropy)：水平波速隨方位角改變。\n海洋岩石圈擴張時，橄欖石 [100] 快軸平行擴張方向。大陸岩石圈快軸常平行古造山帶走向或軟流圈流動方向。`
+          },
+          {
+            heading: '四、 D″ 層的非均向性',
+            content: `隱沒帶下方 D″ 層觀測到 SH 波早於 SV 波。可能源自高壓礦物（鈣鈦礦/方鎂石）定向排列，或板塊物質堆積的水平層狀構造 (SPO)。`
+          },
+          {
+            heading: '五、 固態內核的強烈非均向性',
+            content: `沿自轉軸穿越內核的 PKIKP 波，比沿赤道面快約 1%~3%（約 3 秒）。可能因內核由六方最密堆積 (hcp) 鐵晶體組成，快軸受磁場或熱對流影響平行自轉軸排列。`
+          }
+        ],
+        conclusion: '非均向性結構揭示了地球內部的「動態變形史」。「剪力波分裂」與「方位波速變化」成為直接看見深部流動與變形痕跡的犀利工具。',
+        simulations: ['sim36A', 'sim36B']
+      },
+      {
+        id: '3.7',
+        title: '3.7 地震波的衰減與非彈性',
+        summary: '探討地震波傳播時振幅衰減的物理機制。歸納為幾何擴散、多重路徑、散射與非彈性。引入品質因子 Q 量化衰減，並討論物理頻散現象。',
+        sections: [
+          {
+            heading: '一、 彈性衰減機制',
+            content: `這類衰減機制整體能量守恆：\n1. 幾何擴散：波前面積增大。體波依 $1/r$ 衰減，表面波依 $1/\\sqrt{\\sin\\Delta}$ 衰減。\n2. 多重路徑：波速不均勻導致折射透鏡效應，形成聚焦或發散（焦散面）。\n3. 散射：遇波長相近碎裂帶產生尾波。月球缺水且破碎，散射極強。`,
+            images: [
+              { src: 'image_a30f5c.png', alt: '多重路徑與高速異常區示意圖', desc: '多重路徑 (Multipathing) 的透鏡效應會造成能量聚焦或發散。估算真實非彈性衰減前，必須先排除此干擾。' }
+            ]
+          },
+          {
+            heading: '二、 非彈性與品質因子 (Q)',
+            content: `本質衰減 (Intrinsic Attenuation) 是將力學能轉為熱能的不可逆過程。阻尼諧振子模型的振幅衰減為：\n$$ A(t) = A_0 e^{-\\frac{\\omega_0 t}{2Q}} \\quad \\text{或空間上} \\quad A(x) = A_0 e^{-\\frac{\\pi f x}{Q v}} $$\n$Q$ 值越大衰減越慢。因體積壓縮不耗能，通常 $Q_\\alpha \\approx \\frac{4}{9} Q_\\beta$。`
+          },
+          {
+            heading: '三、 物理頻散與因果律',
+            content: `高頻波能量損耗較嚴重。為維持「因果律」（訊號不可早於理論走時抵達），介質必須具備「物理頻散 (Physical Dispersion)」：\n$$ v(\\omega_1) \\neq v(\\omega_2) $$\n即低頻波速必須略慢於高頻波，完美調和了低頻自由震盪與高頻體波觀測到的波速差異。`
+          },
+          {
+            heading: '四、 衰減與溫度關係',
+            content: `波速與溫度多呈線性關係，但非彈性衰減對溫度呈指數反應。接近岩石熔點或部分熔融時 $Q$ 值急降。結合波速與衰減層析成像，是探測地下熱構造的核心指標。`
+          }
+        ],
+        conclusion: '區分了能量守恆的散射與真實耗能的非彈性。引入 Q 值不僅量化衰減，更調和了物理頻散的因果律必然性，為探測地下熱構造提供指標。',
+        simulations: ['sim37A', 'sim37B']
+      },
+      {
+        id: '3.8',
+        title: '3.8 地函與地核的組成成分',
+        summary: '地震學應用於探索深部物質組成的集大成。結合物理限制與亞當斯-威廉森方程式推導密度，探討地溫梯度、礦物相變對地函的影響，及地核演化。',
+        sections: [
+          {
+            heading: '一、 密度的基本限制與亞當斯-威廉森方程式',
+            content: `地球內部密度分佈推估基礎：體積聲速 $\\Phi$ 結合自身重力壓縮：\n$$ \\Phi = \\frac{K}{\\rho} = v_p^2 - \\frac{4}{3}v_s^2 \\quad \\implies \\quad \\frac{d\\rho}{dr} = -\\frac{G m(r) \\rho(r)}{r^2 \\Phi} $$\n上地函過渡帶密度增幅遠大於重力壓縮理論值，暗示發生了「礦物相變」。`
+          },
+          {
+            heading: '二、 地球內部的溫度分佈 (Geotherm)',
+            content: `- 傳導區（熱邊界層）：岩石圈與 D″ 層，溫度急遽增加。D″ 層高溫導致岩石逼近熔點形成 ULVZ。\n- 對流區：地函與外核，溫度接近絕熱梯度（Adiabatic gradient），隨深度增加極為平緩。`
+          },
+          {
+            heading: '三、 地函的化學組成與礦物相變',
+            content: `地函符合富鎂鐵的橄欖岩 (Pyrolite) 模型。主成分橄欖石隨深度經歷固態相變：\n1. 410km 不連續面：轉為瓦茲利石 ($\\beta$ 相，放熱反應)。\n2. 520km 不連續面：轉為林伍德石 ($\\gamma$ 相)。\n3. 660km 不連續面：分解為緻密的鈣鈦礦 (Perovskite) 與方鎂石 (吸熱反應，佔下地函70%)。`
+          },
+          {
+            heading: '四、 複雜的 D″ 層',
+            content: `D″ 層為化學邊界層假說：隱沒板塊殘骸沉積，或溫度驟升使鈣鈦礦相變為高波速斯石英與低速富鐵方鎂石，後者局部熔融形成 ULVZ。`
+          },
+          {
+            heading: '五、 地核的組成與演化',
+            content: `地核以鐵鎳合金為主，含 10-15% 輕元素。冷卻過程中，純鐵固相率先結晶形成內核（部分結晶 Fractional Crystallization），將輕元素排擠至外核。\n這過程釋放的結晶潛熱與下沉鐵的重力位能，是驅動外核熱對流與地球磁場 (Geodynamo) 的主要動力。`,
+            images: [
+              { src: 'image_a30e64.png', alt: 'Fe-FeS 二元相圖與地核結晶', desc: 'Fe-FeS 二元相圖。純鐵固相沉降形成內核，釋放潛熱與位能，驅動磁場對流。' }
+            ]
+          }
+        ],
+        conclusion: '地球內部非一成不變，而是一部熱化學交織的巨大熱機。從礦物相變到地核動態結晶，讓我們得以一窺行星演化的宏觀奧秘。',
+        simulations: ['sim38A', 'sim38B']
+      }
+    ];
+
+    // -------------------------------------------------------------
+    // 獨立 SVG 動態模擬元件區
+    // -------------------------------------------------------------
+
+    const Sim31A = () => {
+      const [depth, setDepth] = useState(1000);
+      const getLayerInfo = (d) => {
+        if (d < 35) return { name: "地殼 (Crust)", rho: "2.7-3.0", vp: "6.0" };
+        if (d < 2890) return { name: "地函 (Mantle)", rho: "3.3-5.5", vp: "8.0-13.7" };
+        if (d < 5150) return { name: "外核 (Outer Core)", rho: "9.9-12.2", vp: "8.0-10.4 (液態 S=0)" };
+        return { name: "內核 (Inner Core)", rho: "12.8-13.1", vp: "11.0" };
+      };
+      const info = getLayerInfo(depth);
+      return (
+        <div className="bg-slate-900/60 p-6 md:p-8 rounded-2xl border border-slate-700/60 my-6 shadow-xl transition-all duration-300 hover:shadow-cyan-900/20 backdrop-blur-sm">
+          <h3 className="text-xl font-bold text-amber-400 mb-4 tracking-wide">模擬 3.1-A：地球分層結構與波速</h3>
+          <p className="text-base text-slate-300 mb-6 font-light">滑動深度觀察內部狀態與波速特徵。深度：<span className="font-mono text-cyan-300 ml-1">{depth} km</span></p>
+          <input type="range" min="0" max="6371" value={depth} onChange={(e) => setDepth(Number(e.target.value))} className="w-full mb-8 accent-cyan-500 cursor-pointer" />
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            <svg viewBox="0 0 100 100" className="w-36 h-36 md:w-44 md:h-44 shrink-0 drop-shadow-lg">
+              <circle cx="50" cy="50" r="48" fill="#1e293b" stroke="#334155" />
+              <circle cx="50" cy="50" r="26" fill="#b45309" opacity="0.8" />
+              <circle cx="50" cy="50" r="10" fill="#fcd34d" />
+              <circle cx="50" cy="50" r={48 * (1 - depth/6371)} fill="transparent" stroke="#06b6d4" strokeWidth="2.5" strokeDasharray="4" />
+            </svg>
+            <div className="text-base text-cyan-50 bg-slate-800/60 p-6 rounded-xl w-full leading-loose border border-slate-700/50 backdrop-blur-sm">
+              <p><strong className="text-slate-400 font-medium tracking-wide">層圈：</strong> {info.name}</p>
+              <p><strong className="text-slate-400 font-medium tracking-wide">密度 (g/cm³)：</strong> {info.rho}</p>
+              <p><strong className="text-slate-400 font-medium tracking-wide">P波波速 (km/s)：</strong> {info.vp}</p>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const Sim31B = () => {
+      const [rays, setRays] = useState(2);
+      return (
+        <div className="bg-slate-900/60 p-6 md:p-8 rounded-2xl border border-slate-700/60 my-6 shadow-xl transition-all duration-300 hover:shadow-cyan-900/20 backdrop-blur-sm">
+          <h3 className="text-xl font-bold text-amber-400 mb-4 tracking-wide">模擬 3.1-B：逆向問題與解析度</h3>
+          <p className="text-base text-slate-300 mb-6 font-light">增加測站與射線數量（交錯資料），以解析未知的地底構造（紅色異常區）。</p>
+          <input type="range" min="1" max="10" value={rays} onChange={(e) => setRays(Number(e.target.value))} className="w-full mb-8 accent-cyan-500 cursor-pointer" />
+          <div className="relative w-full h-44 bg-slate-800/80 rounded-xl border border-slate-600/60 overflow-hidden shadow-inner">
+            <div className="absolute top-1/2 left-1/2 w-16 h-16 bg-red-500/30 -translate-x-1/2 -translate-y-1/2 blur-md rounded-full"></div>
+            {Array.from({length: rays}).map((_, i) => (
+              <div key={`h-${i}`} className="absolute h-0.5 bg-cyan-400/40 w-full transition-all duration-300" style={{top: `${(i+1)*(100/(rays+1))}%`}}></div>
+            ))}
+            {Array.from({length: rays}).map((_, i) => (
+              <div key={`v-${i}`} className="absolute w-0.5 bg-cyan-400/40 h-full transition-all duration-300" style={{left: `${(i+1)*(100/(rays+1))}%`}}></div>
+            ))}
+            {rays > 5 && <div className="absolute top-1/2 left-1/2 w-16 h-16 bg-red-500/90 border-2 border-red-400 -translate-x-1/2 -translate-y-1/2 opacity-100 transition-opacity duration-500 rounded flex items-center justify-center text-xs font-bold text-white shadow-[0_0_15px_rgba(239,68,68,0.5)]">解析成功</div>}
+          </div>
+        </div>
+      );
+    };
+
+    const Sim32A = () => {
+      const [distance, setDistance] = useState(150);
+      const depth = 40, maxDistance = 300, xc = depth * Math.tan(Math.asin(3/5));
+      const hasHeadWave = distance >= 2 * xc;
+      return (
+        <div className="bg-slate-900/60 p-6 md:p-8 rounded-2xl border border-slate-700/60 my-6 shadow-xl transition-all duration-300 hover:shadow-cyan-900/20 backdrop-blur-sm">
+          <h3 className="text-xl font-bold text-amber-400 mb-4 tracking-wide">模擬 3.2-A：平坦層狀折射波傳</h3>
+          <p className="text-base text-slate-300 mb-6 font-light">觀察直達波(黃)、反射波(藍)與折射頭波(紅)幾何路徑。當前距離: <span className="font-mono text-cyan-300 ml-1">{distance} km</span></p>
+          <input type="range" min="10" max={maxDistance} value={distance} onChange={(e) => setDistance(Number(e.target.value))} className="w-full mb-8 accent-cyan-500 cursor-pointer" />
+          <svg viewBox={`0 0 ${maxDistance} 100`} className="w-full h-36 md:h-44 bg-slate-800/80 rounded-xl shadow-inner border border-slate-700/50">
+            <rect x="0" y="0" width={maxDistance} height={depth} fill="#1e293b" />
+            <rect x="0" y={depth} width={maxDistance} height={100-depth} fill="#0f172a" />
+            <line x1="0" y1={depth} x2={maxDistance} y2={depth} stroke="#475569" strokeDasharray="4" strokeWidth="1.5" />
+            <circle cx="5" cy="5" r="3" fill="#f87171" /><circle cx={distance} cy="5" r="3" fill="#38bdf8" />
+            <line x1="5" y1="5" x2={distance} y2="5" stroke="#fbbf24" strokeWidth="2.5" />
+            <polyline points={`5,5 ${distance/2},${depth} ${distance},5`} fill="none" stroke="#60a5fa" strokeWidth="2.5" />
+            {hasHeadWave && <polyline points={`5,5 ${xc},${depth} ${distance-xc},${depth} ${distance},5`} fill="none" stroke="#f43f5e" strokeWidth="2.5" strokeDasharray="3" />}
+          </svg>
+        </div>
+      );
+    };
+
+    const Sim32B = () => {
+      const [dip, setDip] = useState(10);
+      return (
+        <div className="bg-slate-900/60 p-6 md:p-8 rounded-2xl border border-slate-700/60 my-6 shadow-xl transition-all duration-300 hover:shadow-cyan-900/20 backdrop-blur-sm">
+          <h3 className="text-xl font-bold text-amber-400 mb-4 tracking-wide">模擬 3.2-B：傾斜地層 (Dipping Layer)</h3>
+          <p className="text-base text-slate-300 mb-6 font-light">傾角 $\theta$ 影響視速度。順傾(Down-dip)視速度變慢，逆傾(Up-dip)視速度變快。傾角: <span className="font-mono text-cyan-300 ml-1">{dip}°</span></p>
+          <input type="range" min="0" max="25" value={dip} onChange={(e) => setDip(Number(e.target.value))} className="w-full mb-8 accent-cyan-500 cursor-pointer" />
+          <svg viewBox="0 0 300 100" className="w-full h-36 md:h-44 bg-slate-800/80 rounded-xl shadow-inner border border-slate-700/50">
+            <polygon points={`0,0 300,0 300,${50 + dip*2} 0,50`} fill="#1e293b" className="transition-all duration-300" />
+            <polygon points={`0,50 300,${50 + dip*2} 300,100 0,100`} fill="#0f172a" className="transition-all duration-300" />
+            <line x1="0" y1="50" x2="300" y2={50 + dip*2} stroke="#f43f5e" strokeWidth="2.5" strokeDasharray="4" className="transition-all duration-300" />
+            <text x="10" y="20" fill="#fbbf24" fontSize="12" fontWeight="bold" className="drop-shadow-sm">順傾 (Down-dip) →</text>
+            <text x="190" y="20" fill="#60a5fa" fontSize="12" fontWeight="bold" className="drop-shadow-sm">← 逆傾 (Up-dip)</text>
+          </svg>
+        </div>
+      );
+    };
+
+    const Sim33A = () => {
+      const [vel, setVel] = useState(2000);
+      const t0 = 20;
+      const generateCurve = () => Array.from({length: 40}).map((_, i) => {
+        const x = i * 10;
+        const t = Math.sqrt(t0*t0 + (x*x)/(vel/100)*(vel/100));
+        return `${x},${t+10}`;
+      }).join(' ');
+      return (
+        <div className="bg-slate-900/60 p-6 md:p-8 rounded-2xl border border-slate-700/60 my-6 shadow-xl transition-all duration-300 hover:shadow-cyan-900/20 backdrop-blur-sm">
+          <h3 className="text-xl font-bold text-amber-400 mb-4 tracking-wide">模擬 3.3-A：反射波正常時差 (NMO)</h3>
+          <p className="text-base text-slate-300 mb-6 font-light">波速越快，走時雙曲線越平坦。地層均方根波速: <span className="font-mono text-cyan-300 ml-1">{vel} m/s</span></p>
+          <input type="range" min="1500" max="4000" value={vel} onChange={(e) => setVel(Number(e.target.value))} className="w-full mb-8 accent-cyan-500 cursor-pointer" />
+          <svg viewBox="0 0 400 100" className="w-full h-36 md:h-44 bg-slate-800/80 rounded-xl shadow-inner border border-slate-700/50">
+            <line x1="0" y1="10" x2="400" y2="10" stroke="#475569" strokeWidth="2" />
+            <text x="5" y="8" fill="#94a3b8" fontSize="10">Offset (x)</text>
+            <polyline points={generateCurve()} fill="none" stroke="#06b6d4" strokeWidth="3.5" className="transition-all duration-300" />
+          </svg>
+        </div>
+      );
+    };
+
+    const Sim33B = () => {
+      const [strength, setStrength] = useState(0);
+      return (
+        <div className="bg-slate-900/60 p-6 md:p-8 rounded-2xl border border-slate-700/60 my-6 shadow-xl transition-all duration-300 hover:shadow-cyan-900/20 backdrop-blur-sm">
+          <h3 className="text-xl font-bold text-amber-400 mb-4 tracking-wide">模擬 3.3-B：去迴旋 (Deconvolution)</h3>
+          <p className="text-base text-slate-300 mb-6 font-light">剝離震源波列特徵，使反射訊號「尖銳化」，提升垂直解析度。</p>
+          <input type="range" min="0" max="100" value={strength} onChange={(e) => setStrength(Number(e.target.value))} className="w-full mb-8 accent-cyan-500 cursor-pointer" />
+          <svg viewBox="0 0 400 60" className="w-full h-28 md:h-36 bg-slate-800/80 rounded-xl shadow-inner border border-slate-700/50">
+            <path d={`M 0 30 Q 20 ${30 - 20*(1-strength/100)} 40 30 T 80 30 T 120 30`} fill="none" stroke="#94a3b8" strokeWidth="3" className="transition-all duration-300" />
+            {strength > 50 && <line x1="60" y1="10" x2="60" y2="50" stroke="#f43f5e" strokeWidth="3" className="opacity-80 drop-shadow-md" />}
+            <text x="200" y="35" fill="#f87171" fontSize="14" fontWeight="bold" className="drop-shadow-sm">
+              {strength < 20 ? '原始寬波列' : strength > 80 ? '尖銳反射脈衝' : '濾波處理中...'}
+            </text>
+          </svg>
+        </div>
+      );
+    };
+
+    const Sim34A = () => {
+      const [angle, setAngle] = useState(25);
+      const R = 150, rCore = 80, cx = 200, cy = 200;
+      const rad = (angle * Math.PI) / 180;
+      const penetrationDepth = R * Math.sin(rad); 
+      const isShadowZone = penetrationDepth < rCore + 10 && penetrationDepth > rCore - 20;
+      const hitsCore = penetrationDepth <= rCore;
+      return (
+        <div className="bg-slate-900/60 p-6 md:p-8 rounded-2xl border border-slate-700/60 my-6 shadow-xl transition-all duration-300 hover:shadow-cyan-900/20 backdrop-blur-sm">
+          <h3 className="text-xl font-bold text-amber-400 mb-4 tracking-wide">模擬 3.4-A：球體波傳與陰影區</h3>
+          <p className="text-base text-slate-300 mb-6 font-light">調整射出角度。當波抵達低速外核時急遽向下偏折，產生 P波陰影區。</p>
+          <input type="range" min="15" max="60" value={angle} onChange={(e) => setAngle(Number(e.target.value))} className="w-full mb-8 accent-cyan-500 cursor-pointer" />
+          <div className="flex justify-center relative">
+            <svg width="300" height="200" viewBox="0 0 400 300" className="bg-slate-800/80 rounded-xl shadow-inner border border-slate-700/50">
+              <circle cx={cx} cy={cy} r={R} fill="#0f172a" stroke="#475569" strokeWidth="2.5" />
+              <circle cx={cx} cy={cy} r={rCore} fill="#b45309" opacity="0.4" stroke="#d97706" />
+              <circle cx={cx} cy={cy-R} r="6" fill="#f87171" />
+              {hitsCore ? 
+                <path d={`M ${cx} ${cy-R} Q ${cx-50} ${cy-rCore/2} ${cx-60} ${cy-rCore}`} fill="none" stroke="#ef4444" strokeWidth="3.5" className="transition-all duration-300 drop-shadow-[0_0_5px_rgba(239,68,68,0.6)]" /> :
+                <path d={`M ${cx} ${cy-R} Q ${cx} ${cy-penetrationDepth} ${cx + R*Math.sin(rad*4)} ${cy - R*Math.cos(rad*4)}`} fill="none" stroke="#34d399" strokeWidth="3.5" className="transition-all duration-300 drop-shadow-[0_0_5px_rgba(52,211,153,0.6)]" />
+              }
+            </svg>
+          </div>
+        </div>
+      );
+    };
+
+    const Sim34B = () => {
+      const [pos, setPos] = useState(50);
+      return (
+        <div className="bg-slate-900/60 p-6 md:p-8 rounded-2xl border border-slate-700/60 my-6 shadow-xl transition-all duration-300 hover:shadow-cyan-900/20 backdrop-blur-sm">
+          <h3 className="text-xl font-bold text-amber-400 mb-4 tracking-wide">模擬 3.4-B：三重走時現象 (Triplication)</h3>
+          <p className="text-base text-slate-300 mb-6 font-light">波速急遽增加導致走時曲線產生折疊。單一距離 $\Delta$ 可觀測到三個不同路徑的到達相。</p>
+          <input type="range" min="0" max="100" value={pos} onChange={(e) => setPos(Number(e.target.value))} className="w-full mb-8 accent-cyan-500 cursor-pointer" />
+          <svg viewBox="0 0 400 150" className="w-full h-36 md:h-44 bg-slate-800/80 rounded-xl shadow-inner border border-slate-700/50">
+            <path d="M 50 120 C 150 90, 200 80, 250 60 L 150 50 C 200 30, 300 20, 380 10" fill="none" stroke="#06b6d4" strokeWidth="3" />
+            <line x1={50 + pos*3} y1="0" x2={50 + pos*3} y2="150" stroke="#f43f5e" strokeWidth="2.5" strokeDasharray="4" className="transition-all duration-300" />
+            <text x="10" y="20" fill="#94a3b8" fontSize="12" fontWeight="bold">時間 T</text>
+            <text x="350" y="140" fill="#94a3b8" fontSize="12" fontWeight="bold">距離 Δ</text>
+          </svg>
+        </div>
+      );
+    };
+
+    // -------------------------------------------------------------
+    // 3.5-A 體波命名與動態射線 (能量傳遞版)
+    // -------------------------------------------------------------
+    const Sim35A = () => {
+      const [phase, setPhase] = useState('P');
+      const [animKey, setAnimKey] = useState(0); 
+      
+      const R = 120, rc = 65, ric = 25, cx = 200, cy = 150;
+      const sourceY = cy - R + 5;
+      
+      const paths = {
+        P: `M ${cx} ${sourceY} Q ${cx+70} ${cy-10} ${cx+R*0.96} ${cy+R*0.25}`,
+        S: `M ${cx} ${sourceY} Q ${cx-70} ${cy-10} ${cx-R*0.96} ${cy+R*0.25}`,
+        pP: `M ${cx} ${sourceY} L ${cx-15} ${cy-R+1} Q ${cx-80} ${cy-10} ${cx-R*0.8} ${cy+R*0.6}`,
+        sS: `M ${cx} ${sourceY} L ${cx+15} ${cy-R+1} Q ${cx+80} ${cy-10} ${cx+R*0.8} ${cy+R*0.6}`,
+        PP: `M ${cx} ${sourceY} Q ${cx+40} ${cy-40} ${cx+R*0.7} ${cy-R*0.7} Q ${cx+110} ${cy+20} ${cx+R*0.5} ${cy+R*0.86}`,
+        SS: `M ${cx} ${sourceY} Q ${cx-40} ${cy-40} ${cx-R*0.7} ${cy-R*0.7} Q ${cx-110} ${cy+20} ${cx-R*0.5} ${cy+R*0.86}`,
+        PcP: `M ${cx} ${sourceY} Q ${cx+20} ${cy-30} ${cx+30} ${cy-rc} Q ${cx+50} ${cy-30} ${cx+R*0.6} ${cy-R*0.8}`,
+        ScS: `M ${cx} ${sourceY} Q ${cx-20} ${cy-30} ${cx-30} ${cy-rc} Q ${cx-50} ${cy-30} ${cx-R*0.6} ${cy-R*0.8}`,
+        Pdiff: `M ${cx} ${sourceY} Q ${cx+30} ${cy-60} ${cx+41} ${cy-50} A ${rc} ${rc} 0 0 0 ${cx-41} ${cy-50} Q ${cx-30} ${cy-60} ${cx-R*0.8} ${cy+R*0.6}`,
+        PKP: `M ${cx} ${sourceY} L ${cx+25} ${cy-rc} L ${cx+35} ${cy+rc} L ${cx+60} ${cy+R*0.86}`,
+        PKiKP: `M ${cx} ${sourceY} L ${cx+15} ${cy-20} L ${cx+R*0.6} ${cy+R*0.8}`,
+        PKIKP: `M ${cx} ${sourceY} L ${cx+10} ${cy-rc} L ${cx+5} ${cy-ric} L ${cx} ${cy+ric} L ${cx-10} ${cy+rc} L ${cx-20} ${cy+R}`,
+        SKS: `M ${cx} ${sourceY} L ${cx-25} ${cy-rc} L ${cx-35} ${cy+rc} L ${cx-60} ${cy+R*0.86}`
+      };
+      
+      const colors = { 
+        P: '#34d399', S: '#f472b6', pP: '#38bdf8', sS: '#818cf8', PP: '#a78bfa', SS: '#e879f9',
+        PcP: '#fbbf24', ScS: '#fb923c', Pdiff: '#facc15', PKP: '#ef4444', PKiKP: '#2dd4bf', PKIKP: '#fcd34d', SKS: '#ec4899' 
+      };
+
+      const handlePhaseChange = (p) => {
+        setPhase(p);
+        setAnimKey(prev => prev + 1);
+      };
+
+      const getEndPoint = (pathStr) => {
+        const numbers = pathStr.match(/[-\d.]+/g);
+        if (numbers && numbers.length >= 2) {
+          return {
+            x: parseFloat(numbers[numbers.length - 2]),
+            y: parseFloat(numbers[numbers.length - 1])
+          };
+        }
+        return { x: cx, y: cy };
+      };
+      const endPoint = getEndPoint(paths[phase]);
+
+      return (
+        <div className="bg-slate-900/60 p-6 md:p-8 rounded-2xl border border-slate-700/60 my-6 shadow-xl transition-all duration-300 hover:shadow-cyan-900/20 backdrop-blur-sm">
+          <h3 className="text-xl font-bold text-amber-400 mb-4 flex items-center tracking-wide">
+            <svg className="w-6 h-6 mr-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            模擬 3.5-A：體波命名與動態射線 (能量傳遞版)
+          </h3>
+          <p className="text-base text-slate-300 mb-6 font-light">請點擊下方波相按鈕：觀察能量自「震源」釋放後，以波陣面形式推進，並在抵達「終點」時激發出強烈的能量衝擊波。</p>
+          <div className="flex flex-wrap gap-3 mb-8 justify-center">
+            {Object.keys(paths).map(p => (
+              <button 
+                key={p} 
+                onClick={() => handlePhaseChange(p)} 
+                className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ease-out
+                  ${phase===p ? 'bg-cyan-500 text-slate-900 shadow-[0_0_15px_rgba(6,182,212,0.8)] scale-110' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-600'}`}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+          <div className="flex justify-center relative">
+            <svg key={`simulation-${animKey}`} width="100%" height="320" viewBox="0 0 400 300" className="bg-slate-950/80 rounded-xl shadow-inner overflow-hidden border border-slate-800">
+              <defs>
+                <radialGradient id="mantle-grad" cx="50%" cy="50%" r="50%">
+                  <stop offset="70%" stopColor="#1e293b"/>
+                  <stop offset="100%" stopColor="#0f172a"/>
+                </radialGradient>
+                <radialGradient id="outer-core-grad" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#9a3412" stopOpacity="0.4"/>
+                  <stop offset="100%" stopColor="#ea580c" stopOpacity="0.6"/>
+                </radialGradient>
+                <radialGradient id="inner-core-grad" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#fef08a"/>
+                  <stop offset="100%" stopColor="#eab308"/>
+                </radialGradient>
+                <filter id="wave-glow">
+                  <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+
+              <circle cx={cx} cy={cy} r={R} fill="url(#mantle-grad)" stroke="#475569" strokeWidth="2" />
+              <circle cx={cx} cy={cy} r={rc} fill="url(#outer-core-grad)" stroke="#c2410c" strokeWidth="1.5" strokeDasharray="4" />
+              <circle cx={cx} cy={cy} r={ric} fill="url(#inner-core-grad)" />
+              
+              <text x={cx+R+10} y={cy} fill="#64748b" fontSize="12" fontWeight="bold">地函</text>
+              <text x={cx+rc+5} y={cy} fill="#fdba74" fontSize="12" fontWeight="bold">外核</text>
+              <text x={cx-12} y={cy+4} fill="#854d0e" fontSize="10" fontWeight="bold">內核</text>
+
+              <path d={paths[phase]} fill="none" stroke={colors[phase]} strokeWidth="1.5" strokeDasharray="4" opacity="0.2" />
+
+              <circle cx={cx} cy={sourceY} r="5" fill="#ef4444" />
+              <text x={cx-14} y={sourceY-12} fill="#fca5a5" fontSize="12" fontWeight="bold">震源</text>
+              <g>
+                <circle cx={cx} cy={sourceY} r="0" fill="none" stroke="#ef4444" strokeWidth="2.5">
+                   <animate attributeName="r" values="0;50" dur="1s" begin="0s" repeatCount="1" fill="freeze" />
+                   <animate attributeName="opacity" values="1;0" dur="1s" begin="0s" repeatCount="1" fill="freeze" />
+                </circle>
+                <circle cx={cx} cy={sourceY} r="0" fill="none" stroke="#ef4444" strokeWidth="1.5">
+                   <animate attributeName="r" values="0;40" dur="1s" begin="0.2s" repeatCount="1" fill="freeze" />
+                   <animate attributeName="opacity" values="1;0" dur="1s" begin="0.2s" repeatCount="1" fill="freeze" />
+                </circle>
+              </g>
+
+              <path 
+                id="active-ray"
+                d={paths[phase]} 
+                fill="none" 
+                stroke={colors[phase]} 
+                strokeWidth="3" 
+                strokeLinecap="round"
+                strokeDasharray="1200"
+                strokeDashoffset="1200"
+                filter="url(#wave-glow)"
+              >
+                <animate attributeName="stroke-dashoffset" from="1200" to="0" dur="2.5s" fill="freeze" />
+              </path>
+              
+              <g>
+                {[0, 0.15, 0.3].map((delay, index) => (
+                  <g key={index} filter="url(#wave-glow)" opacity={1 - index * 0.3}>
+                    <path d={`M -${6 + index*4} -${8 + index*3} Q ${4 - index*2} 0, -${6 + index*4} ${8 + index*3}`} fill="none" stroke="#ffffff" strokeWidth={2.5 - index*0.5} strokeLinecap="round" />
+                    <animateMotion dur="2.5s" begin={`${delay}s`} fill="freeze" rotate="auto">
+                      <mpath href="#active-ray" />
+                    </animateMotion>
+                    <animate attributeName="opacity" values={`${1 - index * 0.3};0`} dur="0.1s" begin={`${2.5 + delay}s`} fill="freeze" />
+                  </g>
+                ))}
+              </g>
+
+              <g>
+                <circle cx={endPoint.x} cy={endPoint.y} r="0" fill="none" stroke={colors[phase]} strokeWidth="3.5" filter="url(#wave-glow)" opacity="0">
+                  <animate attributeName="r" values="0;60" dur="1.2s" begin="2.5s" fill="freeze" />
+                  <animate attributeName="opacity" values="0;1;0" keyTimes="0;0.1;1" dur="1.2s" begin="2.5s" fill="freeze" />
+                </circle>
+                <circle cx={endPoint.x} cy={endPoint.y} r="0" fill="none" stroke="#ffffff" strokeWidth="2.5" filter="url(#wave-glow)" opacity="0">
+                  <animate attributeName="r" values="0;40" dur="1s" begin="2.6s" fill="freeze" />
+                  <animate attributeName="opacity" values="0;1;0" keyTimes="0;0.1;1" dur="1s" begin="2.6s" fill="freeze" />
+                </circle>
+                <circle cx={endPoint.x} cy={endPoint.y} r="5" fill="#ffffff" filter="url(#wave-glow)" opacity="0">
+                  <animate attributeName="opacity" values="0;1;0" keyTimes="0;0.1;1" dur="1s" begin="2.5s" fill="freeze" />
+                </circle>
+                <text x={endPoint.x + 10} y={endPoint.y + 4} fill={colors[phase]} fontSize="14" fontWeight="bold" opacity="0" filter="url(#wave-glow)">
+                  能量抵達
+                  <animate attributeName="opacity" values="0;1;0" keyTimes="0;0.1;1" dur="2s" begin="2.5s" fill="freeze" />
+                  <animate attributeName="y" values={`${endPoint.y + 4};${endPoint.y - 20}`} dur="2s" begin="2.5s" fill="freeze" />
+                </text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      );
+    };
+
+    const Sim35B = () => {
+      const [bounces, setBounces] = useState(0);
+      const [animKey, setAnimKey] = useState(0);
+
+      const handleSelect = (b) => {
+        setBounces(b);
+        setAnimKey(prev => prev + 1);
+      };
+
+      const wavelets = {
+        0: "M 0,80 C 15,80 20,20 40,20 C 60,20 65,80 80,80",
+        1: "M 0,80 C 15,80 20,20 40,20 C 40,20 40,140 40,140 C 60,140 65,80 80,80",
+        2: "M 0,80 C 15,80 20,140 40,140 C 60,140 65,80 80,80"
+      };
+
+      const labels = ["S 波 (0° 原相)", "SS 波 (90° 偏移)", "SSS 波 (180° 倒轉)"];
+      const themeColors = ["#34d399", "#38bdf8", "#f43f5e"];
+
+      return (
+        <div className="bg-slate-900/60 p-6 md:p-8 rounded-2xl border border-slate-700/60 my-6 shadow-xl transition-all duration-300 hover:shadow-cyan-900/20 backdrop-blur-sm">
+          <h3 className="text-xl font-bold text-amber-400 mb-4 flex items-center tracking-wide">
+            <svg className="w-6 h-6 mr-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            模擬 3.5-B：表面反射相角動態偏移 (地震儀器紀錄)
+          </h3>
+          <p className="text-base text-slate-300 mb-6 font-light">因鞍點特性，震波每經過一次地表反射產生 90° (π/2) 偏移。請點選不同波相，觀察地震儀器紀錄筆繪製出的真實子波變化。</p>
+          
+          <div className="flex gap-4 mb-8 justify-center">
+            {[0, 1, 2].map(b => (
+              <button 
+                key={b}
+                onClick={() => handleSelect(b)}
+                style={{ borderColor: bounces === b ? themeColors[b] : 'transparent' }}
+                className={`px-6 py-3 rounded-xl text-sm font-bold border-2 transition-all duration-300 ease-out
+                  ${bounces === b ? 'bg-slate-800 shadow-[0_0_15px_rgba(255,255,255,0.1)] scale-105' : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200'}`}
+              >
+                <span style={{ color: bounces === b ? themeColors[b] : 'inherit' }}>{labels[b]}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="relative w-full h-48 md:h-60 bg-slate-950/80 rounded-xl shadow-inner overflow-hidden border border-slate-800">
+            <svg viewBox="0 0 500 160" className="w-full h-full">
+              <defs>
+                <filter id="neon-glow-35b">
+                  <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+                <clipPath id={`draw-mask-${animKey}`}>
+                  <rect x="0" y="0" width="0" height="160">
+                    <animate attributeName="width" from="0" to="500" dur="2s" fill="freeze" />
+                  </rect>
+                </clipPath>
+              </defs>
+
+              <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1e293b" strokeWidth="1.5"/>
+              </pattern>
+              <rect width="100%" height="100%" fill="url(#grid)" />
+              <line x1="0" y1="80" x2="500" y2="80" stroke="#334155" strokeWidth="2.5" strokeDasharray="4" />
+
+              <g clipPath={`url(#draw-mask-${animKey})`}>
+                <path d="M 0 80 L 200 80" fill="none" stroke={themeColors[bounces]} strokeWidth="3.5" filter="url(#neon-glow-35b)" />
+                <g transform="translate(200, 0)">
+                  <path d={wavelets[bounces]} fill="none" stroke={themeColors[bounces]} strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" filter="url(#neon-glow-35b)" />
+                </g>
+                <path d="M 280 80 Q 300 90 310 80 T 340 80 T 360 85 T 380 80 L 500 80" fill="none" stroke={themeColors[bounces]} strokeWidth="3" filter="url(#neon-glow-35b)" />
+              </g>
+
+              <g>
+                <circle cx="0" cy="80" r="5" fill="#ffffff" filter="url(#neon-glow-35b)">
+                   <animate attributeName="cx" values="0;200;280;500" keyTimes="0;0.4;0.56;1" dur="2s" fill="freeze" />
+                   <animate 
+                     attributeName="cy" 
+                     values={
+                       bounces === 0 ? "80;80;20;80;80;80" : 
+                       bounces === 1 ? "80;80;20;140;80;80" : 
+                       "80;80;140;80;80;80"
+                     } 
+                     keyTimes={
+                       bounces === 0 ? "0;0.4;0.48;0.56;0.6;1" : 
+                       bounces === 1 ? "0;0.4;0.44;0.52;0.56;1" : 
+                       "0;0.4;0.48;0.56;0.6;1"
+                     } 
+                     dur="2s" fill="freeze" 
+                   />
+                </circle>
+              </g>
+              <text x="14" y="30" fill={themeColors[bounces]} fontSize="15" fontWeight="bold" opacity="0.9" className="drop-shadow-md">
+                紀錄波相：{labels[bounces]}
+              </text>
+            </svg>
+          </div>
+        </div>
+      );
+    };
+
+    const Sim36A = () => {
+      const [thickness, setThickness] = useState(50);
+      return (
+        <div className="bg-slate-900/60 p-6 md:p-8 rounded-2xl border border-slate-700/60 my-6 shadow-xl transition-all duration-300 hover:shadow-cyan-900/20 backdrop-blur-sm">
+          <h3 className="text-xl font-bold text-amber-400 mb-4 tracking-wide">模擬 3.6-A：剪力波分裂 (Shear Wave Splitting)</h3>
+          <p className="text-base text-slate-300 mb-6 font-light">進入非均向介質後，快波(紅)與慢波(藍)產生延遲時間 δt。厚度越大延遲越明顯。</p>
+          <input type="range" min="10" max="100" value={thickness} onChange={(e) => setThickness(Number(e.target.value))} className="w-full mb-8 accent-cyan-500 cursor-pointer" />
+          <svg viewBox="0 0 400 80" className="w-full h-28 md:h-32 bg-slate-800/80 rounded-xl shadow-inner border border-slate-700/50">
+            <path d="M 0 40 Q 20 10 40 40 T 80 40 T 120 40" fill="none" stroke="#ef4444" strokeWidth="3" className="transition-all duration-300" />
+            <g transform={`translate(-${thickness}, 0)`} className="transition-all duration-300">
+              <path d="M 0 40 Q 20 70 40 40 T 80 40 T 120 40 T 160 40" fill="none" stroke="#3b82f6" strokeWidth="3" strokeDasharray="5" />
+            </g>
+            <line x1="120" y1="20" x2={120-thickness} y2="20" stroke="#facc15" strokeWidth="2.5" className="transition-all duration-300" />
+            <text x={120 - thickness/2 - 5} y="15" fill="#facc15" fontSize="13" fontWeight="bold" className="transition-all duration-300">δt</text>
+          </svg>
+        </div>
+      );
+    };
+
+    const Sim36B = () => {
+      const [azimuth, setAzimuth] = useState(0);
+      const rad = (azimuth * Math.PI) / 180;
+      const vx = Math.cos(rad) * 80; 
+      const vy = Math.sin(rad) * 40; 
+      const speed = Math.sqrt(vx*vx + vy*vy);
+      return (
+        <div className="bg-slate-900/60 p-6 md:p-8 rounded-2xl border border-slate-700/60 my-6 shadow-xl transition-all duration-300 hover:shadow-cyan-900/20 backdrop-blur-sm">
+          <h3 className="text-xl font-bold text-amber-400 mb-4 tracking-wide">模擬 3.6-B：方位非均向性 (Azimuthal Anisotropy)</h3>
+          <p className="text-base text-slate-300 mb-6 font-light">波速隨方位角改變。洋脊擴張時，橄欖石快軸平行擴張方向。目前波速: <span className="font-mono text-cyan-300 ml-1">{speed.toFixed(1)}</span></p>
+          <input type="range" min="0" max="360" value={azimuth} onChange={(e) => setAzimuth(Number(e.target.value))} className="w-full mb-8 accent-cyan-500 cursor-pointer" />
+          <div className="flex justify-center relative">
+            <svg width="200" height="200" viewBox="0 0 200 200" className="bg-slate-800/80 rounded-xl shadow-inner border border-slate-700/50">
+              <ellipse cx="100" cy="100" rx="80" ry="40" fill="#1e293b" stroke="#475569" strokeDasharray="4" strokeWidth="1.5" />
+              <line x1="100" y1="100" x2={100 + vx} y2={100 - vy} stroke="#f43f5e" strokeWidth="4" markerEnd="url(#arrow)" className="transition-all duration-200" />
+              <text x="10" y="20" fill="#94a3b8" fontSize="12" fontWeight="bold">快軸 (水平)</text>
+              <text x="10" y="190" fill="#94a3b8" fontSize="12" fontWeight="bold">慢軸 (垂直)</text>
+            </svg>
+          </div>
+        </div>
+      );
+    };
+
+    const Sim37A = () => {
+      const [q, setQ] = useState(10);
+      const generateDampedWave = () => Array.from({length: 200}).map((_, i) => {
+        const x = i * 2;
+        const y = 50 + 40 * Math.exp(-i / q) * Math.sin(i * 0.5);
+        return `${x},${y}`;
+      }).join(' ');
+      return (
+        <div className="bg-slate-900/60 p-6 md:p-8 rounded-2xl border border-slate-700/60 my-6 shadow-xl transition-all duration-300 hover:shadow-cyan-900/20 backdrop-blur-sm">
+          <h3 className="text-xl font-bold text-amber-400 mb-4 tracking-wide">模擬 3.7-A：本質衰減 (Intrinsic Attenuation)</h3>
+          <p className="text-base text-slate-300 mb-6 font-light">阻尼諧振子模型：Q 值越大阻尼越小，波傳遞得越遠。當前 Q: <span className="font-mono text-cyan-300 ml-1">{q}</span></p>
+          <input type="range" min="5" max="100" value={q} onChange={(e) => setQ(Number(e.target.value))} className="w-full mb-8 accent-cyan-500 cursor-pointer" />
+          <svg viewBox="0 0 400 100" className="w-full h-36 md:h-44 bg-slate-800/80 rounded-xl shadow-inner border border-slate-700/50">
+            <polyline points={generateDampedWave()} fill="none" stroke="#34d399" strokeWidth="3" className="transition-all duration-300" />
+          </svg>
+        </div>
+      );
+    };
+
+    const Sim37B = () => {
+      const [dist, setDist] = useState(20);
+      return (
+        <div className="bg-slate-900/60 p-6 md:p-8 rounded-2xl border border-slate-700/60 my-6 shadow-xl transition-all duration-300 hover:shadow-cyan-900/20 backdrop-blur-sm">
+          <h3 className="text-xl font-bold text-amber-400 mb-4 tracking-wide">模擬 3.7-B：幾何擴散 (Geometric Spreading)</h3>
+          <p className="text-base text-slate-300 mb-6 font-light">隨距離增加，波前總能量守恆但面積擴大，導致振幅隨 1/r 衰減。距離: <span className="font-mono text-cyan-300 ml-1">{dist}</span></p>
+          <input type="range" min="10" max="100" value={dist} onChange={(e) => setDist(Number(e.target.value))} className="w-full mb-8 accent-cyan-500 cursor-pointer" />
+          <div className="flex justify-center relative">
+            <svg width="200" height="200" viewBox="0 0 200 200" className="bg-slate-800/80 rounded-xl shadow-inner border border-slate-700/50">
+              <circle cx="100" cy="100" r={dist} fill="none" stroke={`rgba(6, 182, 212, ${10/dist})`} strokeWidth="4" className="transition-all duration-300" />
+              <circle cx="100" cy="100" r="5" fill="#f87171" />
+            </svg>
+          </div>
+        </div>
+      );
+    };
+
+    const Sim38A = () => {
+      const [depth, setDepth] = useState(300);
+      const getPhase = (d) => {
+        if (d < 410) return "橄欖石 (Olivine, α相)";
+        if (d < 520) return "瓦茲利石 (Wadsleyite, β相)";
+        if (d < 660) return "林伍德石 (Ringwoodite, γ相)";
+        return "鈣鈦礦 (Perovskite) + 方鎂石";
+      };
+      return (
+        <div className="bg-slate-900/60 p-6 md:p-8 rounded-2xl border border-slate-700/60 my-6 shadow-xl transition-all duration-300 hover:shadow-cyan-900/20 backdrop-blur-sm">
+          <h3 className="text-xl font-bold text-amber-400 mb-4 tracking-wide">模擬 3.8-A：地函礦物相變與波速躍升</h3>
+          <p className="text-base text-slate-300 mb-8 font-light">隨著壓力增加，結晶構造緻密化，導致震波速度跳升。</p>
+          <div className="flex gap-8 items-center">
+            <input type="range" min="300" max="800" value={depth} onChange={(e) => setDepth(Number(e.target.value))} className="w-8 h-44 md:h-52 accent-cyan-500 cursor-pointer" style={{writingMode: 'vertical-lr'}} />
+            <div className="flex-1 bg-slate-800/60 p-5 rounded-xl border border-slate-700/50 backdrop-blur-sm">
+              <p className="text-cyan-300 mb-2 font-medium">深度: <span className="font-mono text-xl">{depth} km</span></p>
+              <p className="text-xl md:text-2xl text-amber-200 font-bold mb-6 drop-shadow-sm">{getPhase(depth)}</p>
+              <svg viewBox="0 0 200 150" className="w-full h-36 md:h-44 bg-slate-900/80 rounded-xl shadow-inner border border-slate-700/50">
+                <polyline points="20,20 20,40 60,40 60,70 100,70 100,110 160,110 160,150" fill="none" stroke="#64748b" strokeWidth="3" />
+                <circle cx={depth<410?20: depth<520?60: depth<660?100: 160} cy={(depth-300)/500 * 150} r="7" fill="#f43f5e" className="transition-all duration-300 drop-shadow-md" />
+                <text x="25" y="45" fill="#94a3b8" fontSize="11" fontWeight="bold">410km</text>
+                <text x="65" y="75" fill="#94a3b8" fontSize="11" fontWeight="bold">520km</text>
+                <text x="105" y="115" fill="#94a3b8" fontSize="11" fontWeight="bold">660km</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const Sim38B = () => {
+      const [tempAnomaly, setTempAnomaly] = useState(0);
+      return (
+        <div className="bg-slate-900/60 p-6 md:p-8 rounded-2xl border border-slate-700/60 my-6 shadow-xl transition-all duration-300 hover:shadow-cyan-900/20 backdrop-blur-sm">
+          <h3 className="text-xl font-bold text-amber-400 mb-4 tracking-wide">模擬 3.8-B：地溫梯度與 ULVZ 形成</h3>
+          <p className="text-base text-slate-300 mb-6 font-light">增加核函邊界(CMB)的熱異常。當地溫曲線(紅)超越固相線(黃)，岩石將局部熔融。</p>
+          <input type="range" min="0" max="50" value={tempAnomaly} onChange={(e) => setTempAnomaly(Number(e.target.value))} className="w-full mb-8 accent-cyan-500 cursor-pointer" />
+          <svg viewBox="0 0 200 100" className="w-full h-36 md:h-44 bg-slate-800/80 rounded-xl shadow-inner border border-slate-700/50">
+            <polyline points="20,90 80,60 180,30" fill="none" stroke="#facc15" strokeWidth="2.5" strokeDasharray="4" />
+            <polyline points={`10,90 50,70 ${160+tempAnomaly},40`} fill="none" stroke="#ef4444" strokeWidth="3" className="transition-all duration-300" />
+            <text x="10" y="15" fill="#facc15" fontSize="11" fontWeight="bold">黃線：固相線(熔點)</text>
+            <text x="10" y="30" fill="#ef4444" fontSize="11" fontWeight="bold">紅線：地溫梯度</text>
+            {tempAnomaly > 30 && <circle cx="180" cy="30" r="14" fill="#f97316" opacity="0.7" className="transition-opacity duration-500" />}
+            {tempAnomaly > 30 && <text x="105" y="25" fill="#f97316" fontSize="11" fontWeight="bold" className="transition-opacity duration-500">超低速帶 ULVZ</text>}
+          </svg>
+        </div>
+      );
+    };
+
+    // -------------------------------------------------------------
+    // 主應用程式 App 元件
+    // -------------------------------------------------------------
+    function App() {
+      const [activeTab, setActiveTab] = useState(chapterData[0].id);
+      const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+      // 當章節切換時，觸發 MathJax 重新渲染公式
+      useEffect(() => {
+        if (window.MathJax && window.MathJax.typesetPromise) {
+          window.MathJax.typesetPromise().catch((err) => console.log(err.message));
+        }
+      }, [activeTab]);
+
+      const activeContent = chapterData.find(c => c.id === activeTab);
+
+      const renderSimulation = (simId) => {
+        switch (simId) {
+          case 'sim31A': return <Sim31A key={simId} />;
+          case 'sim31B': return <Sim31B key={simId} />;
+          case 'sim32A': return <Sim32A key={simId} />;
+          case 'sim32B': return <Sim32B key={simId} />;
+          case 'sim33A': return <Sim33A key={simId} />;
+          case 'sim33B': return <Sim33B key={simId} />;
+          case 'sim34A': return <Sim34A key={simId} />;
+          case 'sim34B': return <Sim34B key={simId} />;
+          case 'sim35A': return <Sim35A key={simId} />;
+          case 'sim35B': return <Sim35B key={simId} />;
+          case 'sim36A': return <Sim36A key={simId} />;
+          case 'sim36B': return <Sim36B key={simId} />;
+          case 'sim37A': return <Sim37A key={simId} />;
+          case 'sim37B': return <Sim37B key={simId} />;
+          case 'sim38A': return <Sim38A key={simId} />;
+          case 'sim38B': return <Sim38B key={simId} />;
+          default: return null;
+        }
+      };
+
+      return (
+        <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col overflow-hidden">
+          
+          <header className="shrink-0 flex items-center justify-between px-6 py-5 border-b border-slate-800 bg-slate-950/80 backdrop-blur-md z-20 shadow-md">
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                className="p-2 text-slate-400 hover:text-cyan-400 hover:bg-slate-800/80 rounded-lg transition-all duration-300 ease-out outline-none"
+                title="開關目錄"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+              <h1 className="text-2xl md:text-[1.65rem] font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 tracking-wider drop-shadow-sm">
+                地震學第三章報告
+              </h1>
+            </div>
+          </header>
+
+          <div className="flex flex-1 overflow-hidden relative">
+            <aside 
+              className={`absolute lg:relative z-10 h-full bg-slate-950 shrink-0 transition-all duration-500 ease-in-out overflow-hidden
+                ${isSidebarOpen ? 'translate-x-0 w-72 border-r border-slate-800/80 shadow-[10px_0_20px_rgba(0,0,0,0.5)] lg:shadow-none' : '-translate-x-full w-0 border-r-0 border-transparent'}`}
+            >
+              <nav className="p-5 flex flex-col gap-2.5 overflow-y-auto h-full scrollbar-hide bg-gradient-to-b from-slate-900/40 to-transparent">
+                {chapterData.map((chapter) => (
+                  <button
+                    key={chapter.id}
+                    onClick={() => {
+                      setActiveTab(chapter.id);
+                      if(window.innerWidth < 1024) setIsSidebarOpen(false);
+                    }}
+                    className={`text-left px-5 py-3.5 rounded-xl text-[1.05rem] font-medium transition-all duration-300 ease-out border whitespace-nowrap
+                      ${activeTab === chapter.id 
+                        ? 'bg-cyan-950/60 text-cyan-300 border-cyan-700/80 shadow-[0_0_20px_rgba(6,182,212,0.15)] scale-[1.02]' 
+                        : 'bg-slate-900/50 text-slate-400 border-slate-800/60 hover:bg-slate-800 hover:text-slate-200 hover:border-slate-700'
+                      }`}
+                  >
+                    {chapter.title}
+                  </button>
+                ))}
+              </nav>
+            </aside>
+
+            {isSidebarOpen && (
+              <div 
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm z-0 lg:hidden transition-opacity duration-500"
+                onClick={() => setIsSidebarOpen(false)}
+              />
+            )}
+
+            <main className="flex-1 overflow-y-auto p-6 md:p-12 relative z-0 bg-[#070b14] scroll-smooth">
+              <div className="max-w-4xl mx-auto pb-24 transition-all duration-500">
+                
+                <div className="mb-12 border-l-[6px] border-cyan-500 pl-8 bg-gradient-to-r from-cyan-950/40 via-cyan-950/10 to-transparent py-8 pr-6 rounded-r-2xl shadow-sm">
+                  <h2 className="text-3xl md:text-4xl font-black text-white mb-5 tracking-wide">{activeContent.title}</h2>
+                  <p className="text-slate-300 leading-relaxed text-base md:text-lg font-light tracking-wide">
+                    {activeContent.summary}
+                  </p>
+                </div>
+
+                <div className="space-y-10">
+                  {activeContent.sections.map((sec, idx) => (
+                    <section key={idx} className="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-6 md:p-10 transition-colors duration-300 hover:bg-slate-900/60 shadow-lg shadow-black/20">
+                      <h3 className="text-xl md:text-[1.4rem] font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400 mb-6 pb-4 border-b border-slate-700/50 tracking-wide flex items-center">
+                        <span className="w-1.5 h-6 bg-cyan-500 mr-4 rounded-full inline-block shadow-[0_0_10px_rgba(6,182,212,0.8)]"></span>
+                        {sec.heading}
+                      </h3>
+                      <div className="text-slate-200/95 leading-[1.85] text-base md:text-[1.1rem] tracking-wide whitespace-pre-wrap font-light">
+                        {sec.content}
+                      </div>
+                      
+                      {sec.images && sec.images.length > 0 && (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-10">
+                          {sec.images.map((img, i) => (
+                            <figure key={i} className="bg-slate-900/80 p-5 rounded-2xl border border-slate-700/60 shadow-xl flex flex-col h-full transition-all duration-300 hover:shadow-cyan-900/20 hover:border-slate-600 group">
+                              <div className="w-full h-72 flex items-center justify-center bg-slate-950/80 rounded-xl mb-5 overflow-hidden shadow-inner border border-slate-800/80">
+                                <img 
+                                  src={`https://raw.githubusercontent.com/jimmymochi/seismology_ch3/main/seismology_ch3/figures_extracted_hq_3.5/${encodeURIComponent(img.src)}`}
+                                  alt={img.alt} 
+                                  className="max-w-full max-h-full object-contain p-2 group-hover:scale-[1.03] transition-transform duration-500 ease-out" 
+                                  loading="lazy" 
+                                />
+                              </div>
+                              <figcaption className="text-[0.95rem] text-slate-300/90 leading-relaxed mt-auto border-t border-slate-700/50 pt-4 font-normal tracking-wide">
+                                {img.desc}
+                              </figcaption>
+                            </figure>
+                          ))}
+                        </div>
+                      )}
+                    </section>
+                  ))}
+                </div>
+
+                {activeContent.simulations && activeContent.simulations.length > 0 && (
+                  <div className="mt-16 pt-10 border-t border-slate-800/80">
+                    <h4 className="text-amber-400/90 text-2xl font-bold uppercase tracking-widest mb-10 flex items-center drop-shadow-sm">
+                      <svg className="w-8 h-8 mr-4 drop-shadow-md text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                      </svg>
+                      互動教學動態模擬區
+                    </h4>
+                    <div className="grid grid-cols-1 gap-8">
+                      {activeContent.simulations.map(simId => renderSimulation(simId))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="mt-16 pt-8 border-t border-slate-800/80 bg-gradient-to-r from-slate-900/50 to-slate-900/20 p-8 rounded-2xl shadow-inner border border-slate-800/50">
+                  <h4 className="text-slate-400 text-sm font-bold uppercase tracking-widest mb-4 flex items-center">
+                    <span className="w-1.5 h-4 bg-slate-500 mr-3 rounded-full inline-block"></span>
+                    章節總結
+                  </h4>
+                  <p className="text-slate-300/90 text-base md:text-[1.05rem] leading-[1.8] italic tracking-wide">
+                    {activeContent.conclusion}
+                  </p>
+                </div>
+                
+              </div>
+            </main>
+
+          </div>
+        </div>
+      );
+    }
+
+    // 將 App 元件渲染至根節點
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
 </body>
 </html>
