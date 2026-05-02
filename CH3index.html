@@ -967,6 +967,15 @@
 
       const activeContent = chapterData.find(c => c.id === activeTab);
 
+      // --- 核心修正：路徑自動補完函數 ---
+      const getImgSrc = (chapterId, src) => {
+        if (!src) return '';
+        // 如果 src 已經包含路徑、是外部網址或 dataURI，則不處理
+        if (src.includes('/') || src.startsWith('http') || src.startsWith('data:')) return src;
+        // 自動補足對應章節的資料夾前綴
+        return `figures_extracted_hq_${chapterId}/${src}`;
+      };
+
       const renderSimulation = (simId) => {
         switch (simId) {
           case 'sim31A': return <Sim31A key={simId} />;
@@ -1066,8 +1075,9 @@
                           {sec.images.map((img, i) => (
                             <figure key={i} className="bg-slate-900/80 p-5 rounded-2xl border border-slate-700/60 shadow-xl flex flex-col h-full transition-all duration-300 hover:shadow-cyan-900/20 hover:border-slate-600">
                               <div className="w-full h-72 flex items-center justify-center bg-slate-800/80 rounded-xl mb-5 overflow-hidden shadow-inner border border-slate-700/50">
+                                {/* --- 核心修正處：使用 getImgSrc 處理路徑 --- */}
                                 <img 
-                                  src={img.src} 
+                                  src={getImgSrc(activeContent.id, img.src)} 
                                   alt={img.alt} 
                                   className="max-w-full max-h-full object-contain p-2 hover:scale-[1.02] transition-transform duration-500" 
                                   loading="lazy" 
