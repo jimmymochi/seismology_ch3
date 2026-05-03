@@ -112,7 +112,7 @@
           },
           {
             heading: '二、 走時：正向與逆向問題',
-            content: `地震波走時 $T$ 是路徑上「慢度 $p$」（Slowness, $p = 1/v$）的線積分：\n$$ T = \\int_{\\Gamma} \\frac{1}{v(s)} ds = \\int_{\\Gamma} p \\, ds $$\n\n- 正向問題：已知速度結構求走時。\n- 逆向問題：從地表觀測走時反推地下速度結構。因單一射線僅提供整體積分結果，需仰賴大量不同震源-測站的觀測組合進行逆向求解。`
+            content: `地震波走時 $T$ 是路徑上「慢度 $p$」（Slowness, $p = 1/v$）的線積分：\n$$T = \\int_{\\Gamma} \\frac{1}{v(s)} ds = \\int_{\\Gamma} p \\, ds$$\n\n- 正向問題：已知速度結構求走時。\n- 逆向問題：從地表觀測走時反推地下速度結構。因單一射線僅提供整體積分結果，需仰賴大量不同震源-測站的觀測組合進行逆向求解。`
           },
           {
             heading: '三、 模型演進與折射震測基礎',
@@ -140,7 +140,7 @@
           },
           {
             heading: '三、 傾斜層狀模型 (Dipping Layer Method)',
-            content: `當地下介面存在傾角 $\\theta$ 時，需進行反轉剖面 (Reversed Profile) 實驗。\n根據幾何推導，順傾與逆傾的視速度滿足：\n$$ v_{down} = \\frac{v_0}{\\sin(i_c + \\theta)} < v_1 $$\n$$ v_{up} = \\frac{v_0}{\\sin(i_c - \\theta)} > v_1 $$\n利用兩個方向的視速度與截距時間差異，可推算真實傾角 $\\theta$ 與介面深度。`
+            content: `當地下介面存在傾角 $\\theta$ 時，需進行反轉剖面 (Reversed Profile) 實驗。\n根據幾何推導，順傾與逆傾的視速度滿足：\n$$v_{down} = \\frac{v_0}{\\sin(i_c + \\theta)} < v_1$$\n$$v_{up} = \\frac{v_0}{\\sin(i_c - \\theta)} > v_1$$\n利用兩個方向的視速度與截距時間差異，可推算真實傾角 $\\theta$ 與介面深度。`
           },
           {
             heading: '四、 資料分析的限制與盲區 (Blind Zones)',
@@ -161,14 +161,14 @@
         sections: [
           {
             heading: '一、 反射波與正常時差 (NMO)',
-            content: `雙曲線走時與正常時差（NMO, $\\Delta T$）：\n$$ T(x)^2 = t_0^2 + \\frac{x^2}{v_{rms}^2} \\implies \\Delta T \\approx \\frac{x^2}{2 v_{rms}^2 t_0} $$\n多層結構中，可透過 Dix 方程式由兩層的均方根速度反求區間速度：\n$$ v_{int}^2 = \\frac{v_2^2 t_2 - v_1^2 t_1}{t_2 - t_1} $$`,
+            content: `雙曲線走時與正常時差（NMO, $\\Delta T$）：\n$$T(x)^2 = t_0^2 + \\frac{x^2}{v_{rms}^2} \\implies \\Delta T \\approx \\frac{x^2}{2 v_{rms}^2 t_0}$$\n多層結構中，可透過 Dix 方程式由兩層的均方根速度反求區間速度：\n$$v_{int}^2 = \\frac{v_2^2 t_2 - v_1^2 t_1}{t_2 - t_1}$$`,
             images: [
-              { src: 'image_a315ff.png', alt: '多層水平地層反射射線幾何圖', desc: '多層地層的反射幾何。此模型為推導雙曲線走時、Dix 方程式與 NMO 的基礎。' }
+              { src: '螢幕擷取畫面 2026-05-03 000122.png', alt: '多層水平地層反射射線幾何圖', desc: '多層地層的反射幾何。此模型為推導雙曲線走時、Dix 方程式與 NMO 的基礎。' }
             ]
           },
           {
             heading: '二、 截距-慢度空間轉換 (τ-p Formulation)',
-            content: `$\\tau-p$ 空間轉換（截距-慢度）：\n定義 $\\tau = T - px$。反射波的雙曲線在此空間中會映射為橢圓：\n$$ \\frac{p^2}{1/v^2} + \\frac{\\tau^2}{t_0^2} = 1 $$\n直達波與頭波則收斂為點，易於在 $\\tau-p$ 空間中濾除表面波等線性干擾。`
+            content: `$\\tau-p$ 空間轉換（截距-慢度）：\n定義 $\\tau = T - px$。反射波的雙曲線在此空間中會映射為橢圓：\n$$\\frac{p^2}{1/v^2} + \\frac{\\tau^2}{t_0^2} = 1$$\n直達波與頭波則收斂為點，易於在 $\\tau-p$ 空間中濾除表面波等線性干擾。`
           },
           {
             heading: '三、 共中點疊加 (CMP Stacking)',
@@ -176,11 +176,11 @@
           },
           {
             heading: '四、 去迴旋 (Deconvolution)',
-            content: `地震紀錄可視為震源波列 $W(t)$ 與地下反射係數序列 $R(t)$ 的卷積：\n$$ S(t) = W(t) * R(t) $$\n去迴旋透過設計反相濾波器剝離 $W(t)$，使反射訊號「尖銳化」（逼近 Delta 函數），大幅提升垂直解析度。`
+            content: `地震紀錄可視為震源波列 $W(t)$ 與地下反射係數序列 $R(t)$ 的卷積：\n$$S(t) = W(t) * R(t)$$\n去迴旋透過設計反相濾波器剝離 $W(t)$，使反射訊號「尖銳化」（逼近 Delta 函數），大幅提升垂直解析度。`
           },
           {
             heading: '五、 逆向偏移 (Migration) 與真實成像',
-            content: `未處理的時間剖面有繞射尾巴，且傾斜地層視傾角偏緩。逆向偏移利用「爆炸反射面模型」，修正波動幾何效應：\n$$ \\tan \\theta_{true} = \\frac{\\tan \\theta_{app}}{\\cos \\theta_{app}} $$\n透過波場向下延拓消除繞射尾巴，將傾斜地層歸位至真實深度的幾何影像。`
+            content: `未處理的時間剖面有繞射尾巴，且傾斜地層視傾角偏緩。逆向偏移利用「爆炸反射面模型」，修正波動幾何效應：\n$$\\tan \\theta_{true} = \\frac{\\tan \\theta_{app}}{\\cos \\theta_{app}}$$\n透過波場向下延拓消除繞射尾巴，將傾斜地層歸位至真實深度的幾何影像。`
           }
         ],
         conclusion: '反射震測學提供精細的地質「X光片」。本節詳述了從野外多頻道觀測、空間轉換到波動力達成像的完整體系，為解析深部構造提供無可替代的工具。',
@@ -193,14 +193,14 @@
         sections: [
           {
             heading: '一、 球體司乃耳定律與射線參數',
-            content: `球體模型中，射線參數被修正為包含半徑 $r$ 的形式：\n$$ p = \\frac{r \\sin i}{v} = \\text{constant} $$\n隨深度增加波速變快，$\\sin i$ 增大。當 $i=90^\\circ$ 時達射線最深點（Bottoming point），此時 $p = r_p / v_p$。`,
+            content: `球體模型中，射線參數被修正為包含半徑 $r$ 的形式：\n$$p = \\frac{r \\sin i}{v} = \\text{constant}$$\n隨深度增加波速變快，$\\sin i$ 增大。當 $i=90^\\circ$ 時達射線最深點（Bottoming point），此時 $p = r_p / v_p$。`,
             images: [
-              { src: 'image_a31319.png', alt: '球體司乃耳定律與射線幾何圖', desc: '球體司乃耳定律與射線幾何圖。射線穿越同心球體分層時，射線參數 p 沿路徑恆定不變。' }
+              { src: '螢幕擷取畫面 2026-05-03 000154.png', alt: '球體司乃耳定律與射線幾何圖', desc: '球體司乃耳定律與射線幾何圖。射線穿越同心球體分層時，射線參數 p 沿路徑恆定不變。' }
             ]
           },
           {
             heading: '二、 走時曲線與射線參數的積分關係',
-            content: `角距離 $\\Delta$ 與走時 $T$ 之積分關係：\n$$ \\Delta(p) = \\int \\frac{p}{r \\sqrt{(r/v)^2 - p^2}} dr \\quad,\\quad T(p) = \\int \\frac{r/v^2}{\\sqrt{(r/v)^2 - p^2}} dr $$\n走時曲線的斜率即為射線參數：$p = \\frac{dT}{d\\Delta}$。`
+            content: `角距離 $\\Delta$ 與走時 $T$ 之積分關係：\n$$\\Delta(p) = \\int \\frac{p}{r \\sqrt{(r/v)^2 - p^2}} dr \\quad,\\quad T(p) = \\int \\frac{r/v^2}{\\sqrt{(r/v)^2 - p^2}} dr$$\n走時曲線的斜率即為射線參數：$p = \\frac{dT}{d\\Delta}$。`
           },
           {
             heading: '三、 速度分佈效應對走時的影響',
@@ -208,7 +208,7 @@
           },
           {
             heading: '四、 Herglotz-Wiechert 積分反演',
-            content: `從走時觀測反推速度分佈的經典解析解：\n$$ \\ln\\left(\\frac{R}{r_1}\\right) = \\frac{1}{\\pi} \\int_{0}^{\\Delta_1} \\cosh^{-1}\\left(\\frac{p(\\Delta)}{p_1}\\right) d\\Delta $$\n可直接計算反轉深度與波速，但在遭遇低速帶時因缺乏射線資訊而失效。`
+            content: `從走時觀測反推速度分佈的經典解析解：\n$$\\ln\\left(\\frac{R}{r_1}\\right) = \\frac{1}{\\pi} \\int_{0}^{\\Delta_1} \\cosh^{-1}\\left(\\frac{p(\\Delta)}{p_1}\\right) d\\Delta$$\n可直接計算反轉深度與波速，但在遭遇低速帶時因缺乏射線資訊而失效。`
           }
         ],
         conclusion: '透過球體射線幾何與積分公式，闡明了相變與低速帶如何投射出三重走時與陰影區等奇異現象。為建立全球標準地球模型奠定基礎。',
@@ -231,7 +231,7 @@
           },
           {
             heading: '二、 表面反射波與相角偏移 (Phase Shift)',
-            content: `表面反射波（如 PP, SS）在距離上是最大走時，在方位上是最小走時，具有「鞍點（Saddle point）」特性。根據波傳理論，每次地表反射會產生 $\\pi/2$ 相角偏移，對應於希爾伯特轉換 (Hilbert Transform)：\n$$ u_{shift}(t) = \\mathcal{H}[u(t)] = \\frac{1}{\\pi} \\mathcal{P} \\int_{-\\infty}^{\\infty} \\frac{u(\\tau)}{t-\\tau} d\\tau $$\n導致 SS 波形失真，SSS 波形則上下顛倒。`,
+            content: `表面反射波（如 PP, SS）在距離上是最大走時，在方位上是最小走時，具有「鞍點（Saddle point）」特性。根據波傳理論，每次地表反射會產生 $\\pi/2$ 相角偏移，對應於希爾伯特轉換 (Hilbert Transform)：\n$$u_{shift}(t) = \\mathcal{H}[u(t)] = \\frac{1}{\\pi} \\mathcal{P} \\int_{-\\infty}^{\\infty} \\frac{u(\\tau)}{t-\\tau} d\\tau$$\n導致 SS 波形失真，SSS 波形則上下顛倒。`,
             images: [
               { src: 'Fig3.5-4_1.png', alt: '圖 3.5-4(a)', desc: '圖 3.5-4(a)：穿越地球整體的全域射線路徑。' },
               { src: 'Fig3.5-4_2.png', alt: '圖 3.5-4(b)', desc: '圖 3.5-4(b)：PP 波在地表發生反射的射線幾何特性。' },
@@ -284,13 +284,13 @@
         sections: [
           {
             heading: '一、 非均向性的基本概念與來源',
-            content: `非均向性 (Anisotropy) 即介質性質隨方向改變，廣義虎克定律描述為：\n$$ \\sigma_{ij} = c_{ijkl} \\epsilon_{kl} $$\n1. 形狀優選方位 (SPO)：巨觀構造排列（如沉積層、平行裂隙）。\n2. 晶格優選方位 (LPO)：岩石受剪力變形，橄欖石等微觀礦物晶體順應力定向排列。`
+            content: `非均向性 (Anisotropy) 即介質性質隨方向改變，廣義虎克定律描述為：\n$$\\sigma_{ij} = c_{ijkl} \\epsilon_{kl}$$\n1. 形狀優選方位 (SPO)：巨觀構造排列（如沉積層、平行裂隙）。\n2. 晶格優選方位 (LPO)：岩石受剪力變形，橄欖石等微觀礦物晶體順應力定向排列。`
           },
           {
             heading: '二、 橫向等向性與剪力波分裂',
-            content: `橫向等向性 (Transverse Isotropy)：具旋轉對稱軸（通常為垂直方向），SH 波速通常大於 SV 波速。\n\n剪力波分裂 (Shear Wave Splitting)：\n剪力波進入非均向介質分解為沿「快軸」與「慢軸」的正交分量。延遲時間 $\\delta t$ 與層厚 $L$ 相關：\n$$ \\delta t = L \\left( \\frac{1}{v_{slow}} - \\frac{1}{v_{fast}} \\right) $$`,
+            content: `橫向等向性 (Transverse Isotropy)：具旋轉對稱軸（通常為垂直方向），SH 波速通常大於 SV 波速。\n\n剪力波分裂 (Shear Wave Splitting)：\n剪力波進入非均向介質分解為沿「快軸」與「慢軸」的正交分量。延遲時間 $\\delta t$ 與層厚 $L$ 相關：\n$$\\delta t = L \\left( \\frac{1}{v_{slow}} - \\frac{1}{v_{fast}} \\right)$$`,
             images: [
-              { src: 'image_a31281.png', alt: '剪力波極化與橫向等向性示意圖', desc: '剪力波極化與橫向等向性幾何示意圖。解釋剪力波分裂（Shear Wave Splitting）機制的基礎物理模型。' }
+              { src: '螢幕擷取畫面 2026-05-03 000241.png', alt: '剪力波極化與橫向等向性示意圖', desc: '剪力波極化與橫向等向性幾何示意圖。解釋剪力波分裂（Shear Wave Splitting）機制的基礎物理模型。' }
             ]
           },
           {
@@ -318,16 +318,16 @@
             heading: '一、 彈性衰減機制',
             content: `這類衰減機制整體能量守恆：\n1. 幾何擴散：波前面積增大。體波依 $1/r$ 衰減，表面波依 $1/\\sqrt{\\sin\\Delta}$ 衰減。\n2. 多重路徑：波速不均勻導致折射透鏡效應，形成聚焦或發散（焦散面）。\n3. 散射：遇波長相近碎裂帶產生尾波。月球缺水且破碎，散射極強。`,
             images: [
-              { src: 'image_a30f5c.png', alt: '多重路徑與高速異常區示意圖', desc: '多重路徑 (Multipathing) 的透鏡效應會造成能量聚焦或發散。估算真實非彈性衰減前，必須先排除此干擾。' }
+              { src: '螢幕擷取畫面 2026-05-03 000330.png', alt: '多重路徑與高速異常區示意圖', desc: '多重路徑 (Multipathing) 的透鏡效應會造成能量聚焦或發散。估算真實非彈性衰減前，必須先排除此干擾。' }
             ]
           },
           {
             heading: '二、 非彈性與品質因子 (Q)',
-            content: `本質衰減 (Intrinsic Attenuation) 是將力學能轉為熱能的不可逆過程。阻尼諧振子模型的振幅衰減為：\n$$ A(t) = A_0 e^{-\\frac{\\omega_0 t}{2Q}} \\quad \\text{或空間上} \\quad A(x) = A_0 e^{-\\frac{\\pi f x}{Q v}} $$\n$Q$ 值越大衰減越慢。因體積壓縮不耗能，通常 $Q_\\alpha \\approx \\frac{4}{9} Q_\\beta$。`
+            content: `本質衰減 (Intrinsic Attenuation) 是將力學能轉為熱能的不可逆過程。阻尼諧振子模型的振幅衰減為：\n$$A(t) = A_0 e^{-\\frac{\\omega_0 t}{2Q}} \\quad \\text{或空間上} \\quad A(x) = A_0 e^{-\\frac{\\pi f x}{Q v}}$$\n$Q$ 值越大衰減越慢。因體積壓縮不耗能，通常 $Q_\\alpha \\approx \\frac{4}{9} Q_\\beta$。`
           },
           {
             heading: '三、 物理頻散與因果律',
-            content: `高頻波能量損耗較嚴重。為維持「因果律」（訊號不可早於理論走時抵達），介質必須具備「物理頻散 (Physical Dispersion)」：\n$$ v(\\omega_1) \\neq v(\\omega_2) $$\n即低頻波速必須略慢於高頻波，完美調和了低頻自由震盪與高頻體波觀測到的波速差異。`
+            content: `高頻波能量損耗較嚴重。為維持「因果律」（訊號不可早於理論走時抵達），介質必須具備「物理頻散 (Physical Dispersion)」：\n$$v(\\omega_1) \\neq v(\\omega_2)$$\n即低頻波速必須略慢於高頻波，完美調和了低頻自由震盪與高頻體波觀測到的波速差異。`
           },
           {
             heading: '四、 衰減與溫度關係',
@@ -344,7 +344,7 @@
         sections: [
           {
             heading: '一、 密度的基本限制與亞當斯-威廉森方程式',
-            content: `地球內部密度分佈推估基礎：體積聲速 $\\Phi$ 結合自身重力壓縮：\n$$ \\Phi = \\frac{K}{\\rho} = v_p^2 - \\frac{4}{3}v_s^2 \\quad \\implies \\quad \\frac{d\\rho}{dr} = -\\frac{G m(r) \\rho(r)}{r^2 \\Phi} $$\n上地函過渡帶密度增幅遠大於重力壓縮理論值，暗示發生了「礦物相變」。`
+            content: `地球內部密度分佈推估基礎：體積聲速 $\\Phi$ 結合自身重力壓縮：\n$$\\Phi = \\frac{K}{\\rho} = v_p^2 - \\frac{4}{3}v_s^2 \\quad \\implies \\quad \\frac{d\\rho}{dr} = -\\frac{G m(r) \\rho(r)}{r^2 \\Phi}$$\n上地函過渡帶密度增幅遠大於重力壓縮理論值，暗示發生了「礦物相變」。`
           },
           {
             heading: '二、 地球內部的溫度分佈 (Geotherm)',
@@ -362,7 +362,7 @@
             heading: '五、 地核的組成與演化',
             content: `地核以鐵鎳合金為主，含 10-15% 輕元素。冷卻過程中，純鐵固相率先結晶形成內核（部分結晶 Fractional Crystallization），將輕元素排擠至外核。\n這過程釋放的結晶潛熱與下沉鐵的重力位能，是驅動外核熱對流與地球磁場 (Geodynamo) 的主要動力。`,
             images: [
-              { src: 'image_a30e64.png', alt: 'Fe-FeS 二元相圖與地核結晶', desc: 'Fe-FeS 二元相圖。純鐵固相沉降形成內核，釋放潛熱與位能，驅動磁場對流。' }
+              { src: '螢幕擷取畫面 2026-05-03 000448.png', alt: 'Fe-FeS 二元相圖與地核結晶', desc: 'Fe-FeS 二元相圖。純鐵固相沉降形成內核，釋放潛熱與位能，驅動磁場對流。' }
             ]
           }
         ],
@@ -1032,7 +1032,7 @@
             )}
 
             <main className="flex-1 overflow-y-auto p-6 md:p-12 relative z-0 bg-[#070b14] scroll-smooth">
-              <div className="max-w-4xl mx-auto pb-24 transition-all duration-500">
+              <div className="max-w-5xl mx-auto pb-24 transition-all duration-500">
                 
                 <div className="mb-12 border-l-[6px] border-cyan-500 pl-8 bg-gradient-to-r from-cyan-950/40 via-cyan-950/10 to-transparent py-8 pr-6 rounded-r-2xl shadow-sm">
                   <h2 className="text-3xl md:text-4xl font-black text-white mb-5 tracking-wide">{activeContent.title}</h2>
@@ -1056,11 +1056,11 @@
                         <div className={`grid grid-cols-1 ${sec.images.length === 1 ? '' : 'lg:grid-cols-2'} gap-8 mt-10`}>
                           {sec.images.map((img, i) => (
                             <figure key={i} className="bg-slate-900/80 p-5 rounded-2xl border border-slate-700/60 shadow-xl flex flex-col h-full transition-all duration-300 hover:shadow-cyan-900/20 hover:border-slate-600 group">
-                              <div className={`w-full flex items-center justify-center bg-slate-950/80 rounded-xl mb-5 overflow-hidden shadow-inner border border-slate-800/80 ${sec.images.length === 1 ? 'h-[450px] md:h-[650px]' : 'h-72'}`}>
+                              <div className={`w-full flex items-center justify-center bg-slate-950/80 rounded-xl mb-5 overflow-hidden shadow-inner border border-slate-800/80 ${sec.images.length === 1 ? 'py-6 md:py-8' : 'h-72'}`}>
                                 <img 
-                                  src={`https://raw.githubusercontent.com/jimmymochi/seismology_ch3/main/seismology_ch3/figures_extracted_hq_3.5/${encodeURIComponent(img.src)}`}
+                                  src={`https://raw.githubusercontent.com/jimmymochi/seismology_ch3/main/seismology_ch3/figures_extracted_hq_3.5/${encodeURIComponent(img.src)}`}
                                   alt={img.alt} 
-                                  className="max-w-full max-h-full object-contain p-2 group-hover:scale-[1.03] transition-transform duration-500 ease-out" 
+                                  className={`object-contain group-hover:scale-[1.02] transition-transform duration-500 ease-out ${sec.images.length === 1 ? 'w-full h-auto max-h-[80vh] px-2 md:px-4' : 'max-w-full max-h-full p-2'}`}
                                   loading="lazy" 
                                 />
                               </div>
