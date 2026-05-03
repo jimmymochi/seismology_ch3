@@ -57,6 +57,50 @@
 
     // --- 資料層：完整收錄 3.1 至 3.8 章節內容 ---
     const chapterData = [
+      {
+        id: 'event_20220322',
+        title: 'ML 6.60 發震時間 2022-03-22 17:41:39',
+        summary: '本節展示 2022 年 3 月 22 日花蓮地震（ML 6.6）的實際觀測紀錄與波形剖面（Record Sections）。這些實測資料是驗證地震波走時與地殼速度結構的最直接證據。',
+        sections: [
+          {
+            heading: '一、 中央氣象局地震報告',
+            content: '本次展示的地震事件發生於 2022 年 3 月 22 日 17:41:39 (UTC)，即台灣時間 3 月 23 日凌晨 1 時 41 分。震央位於花蓮近海，芮氏規模達 ML 6.6，深度 30.6 公里。此報告詳細記錄了震央位置、深度、規模及各地最大震度。',
+            images: [
+              { src: '2022032301413966019_H.png', alt: 'CWB Earthquake Report', desc: '中央氣象局地震報告：詳細記錄 2022-03-22 17:41:39 (UTC) 花蓮地震的各項震源參數。' }
+            ]
+          },
+          {
+            heading: '二、 全域波形距離剖面 (Waveform Record Section)',
+            content: '本圖展示全台寬頻地震測站觀測到的垂直向波形，隨震央距離分佈之排列圖。從圖中可清晰看見大地震激發的強烈體波與大振幅表面波如何向外傳播並橫掃全島。',
+            images: [
+              { src: 'WF_2022-03-22T17_41_39Z.png', alt: 'Waveform Record Section', desc: '全台測站垂直向波形隨震央距離之排列圖。完整呈現震波擴散的幾何特徵。' }
+            ]
+          },
+          {
+            heading: '三、 走時距離紀錄剖面 (Distance Record Section)',
+            content: '此剖面將各測站的地震波形依據「震央距離（Epicentral Distance）」進行排列，橫軸為距離，縱軸為走時（Travel Time）。\n\n可以直觀觀察到 P波與 S波隨著距離增加而產生的時間延遲。走時曲線的斜率反映了波在不同深度介質中的視慢度（Apparent Slowness），這是推導地球內部一維速度結構的基礎。',
+            images: [
+              { src: 'record_section_20220322174139.png', alt: 'Record Section', desc: '標準距離-走時剖面圖。清晰呈現體波抵達時間隨震央距離的延遲現象。' }
+            ]
+          },
+          {
+            heading: '四、 線性排列剖面 (Linear Record Section)',
+            content: '將震波紀錄以線性展開排列。在此視角下，特定群度的波相走時會被突顯。\n\n這種排列方式極大化了我們對特定深度折射波或反射波的識別能力，並能輕易挑出具有異常走時的測站，用於後續的震源重新定位或構造異常分析。',
+            images: [
+              { src: 'record_section_linear_20220322174139.png', alt: 'Linear Record Section', desc: '線性排列走時剖面圖。便於識別特定視速度的波相與局部異常。' }
+            ]
+          },
+          {
+            heading: '五、 測站紀錄剖面 (Station Record Section)',
+            content: '此圖譜依據測站名稱或方位進行排列，而非單純的震央距離。相較於距離排列，此方式能更直觀地看出同一地震在不同地質場址下的波形變異。\n\n透過比對不同測站的振幅與頻率特徵，可以進一步推估震源的輻射場效應（Radiation Pattern），以及各測站底下的局部場址放大效應（Site Effects）。',
+            images: [
+              { src: 'record_section_station_20220322174139.png', alt: 'Station Record Section', desc: '按測站排列的波形剖面圖。突顯場址效應與波形的空間方位差異。' }
+            ]
+          }
+        ],
+        conclusion: '真實的地震紀錄是驗證地球物理理論的唯一標準。這五張不同視角的剖面圖與報告，完整體現了地震波在複雜地殼介質中傳播時的時間、空間與場址交互特性。',
+        simulations: []
+      },
       {
         id: '3.1',
         title: '3.1 導論：地震學與地球結構',
@@ -1009,10 +1053,10 @@
                       </div>
                       
                       {sec.images && sec.images.length > 0 && (
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-10">
+                        <div className={`grid grid-cols-1 ${sec.images.length === 1 ? '' : 'lg:grid-cols-2'} gap-8 mt-10`}>
                           {sec.images.map((img, i) => (
                             <figure key={i} className="bg-slate-900/80 p-5 rounded-2xl border border-slate-700/60 shadow-xl flex flex-col h-full transition-all duration-300 hover:shadow-cyan-900/20 hover:border-slate-600 group">
-                              <div className="w-full h-72 flex items-center justify-center bg-slate-950/80 rounded-xl mb-5 overflow-hidden shadow-inner border border-slate-800/80">
+                              <div className={`w-full flex items-center justify-center bg-slate-950/80 rounded-xl mb-5 overflow-hidden shadow-inner border border-slate-800/80 ${sec.images.length === 1 ? 'h-[450px] md:h-[650px]' : 'h-72'}`}>
                                 <img 
                                   src={`https://raw.githubusercontent.com/jimmymochi/seismology_ch3/main/seismology_ch3/figures_extracted_hq_3.5/${encodeURIComponent(img.src)}`}
                                   alt={img.alt} 
