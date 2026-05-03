@@ -947,11 +947,15 @@
     function App() {
       const [activeTab, setActiveTab] = useState(chapterData[0].id);
       const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+      const mainRef = useRef(null);
 
-      // 當章節切換時，觸發 MathJax 重新渲染公式
+      // 當章節切換時，觸發 MathJax 重新渲染公式並平滑滾動至頂部
       useEffect(() => {
         if (window.MathJax && window.MathJax.typesetPromise) {
           window.MathJax.typesetPromise().catch((err) => console.log(err.message));
+        }
+        if (mainRef.current) {
+          mainRef.current.scrollTo({ top: 0, behavior: 'smooth' });
         }
       }, [activeTab]);
 
@@ -1031,7 +1035,7 @@
               />
             )}
 
-            <main className="flex-1 overflow-y-auto p-6 md:p-12 relative z-0 bg-[#070b14] scroll-smooth">
+            <main ref={mainRef} className="flex-1 overflow-y-auto p-6 md:p-12 relative z-0 bg-[#070b14] scroll-smooth">
               <div className="max-w-5xl mx-auto pb-24 transition-all duration-500">
                 
                 <div className="mb-12 border-l-[6px] border-cyan-500 pl-8 bg-gradient-to-r from-cyan-950/40 via-cyan-950/10 to-transparent py-8 pr-6 rounded-r-2xl shadow-sm">
